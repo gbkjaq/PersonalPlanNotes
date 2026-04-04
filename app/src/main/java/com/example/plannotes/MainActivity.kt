@@ -11,7 +11,6 @@ import com.example.plannotes.data.DataManager
 import com.example.plannotes.ui.AccountDetailFragment
 import com.example.plannotes.ui.HomeFragment
 import com.example.plannotes.ui.SettingsFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.EditText
 
 class MainActivity : AppCompatActivity() {
@@ -77,8 +76,10 @@ class MainActivity : AppCompatActivity() {
             setText(currentName)
         }
         
+        val title = if (currentName.isEmpty()) R.string.add_account else R.string.rename
+        
         AlertDialog.Builder(this)
-            .setTitle(R.string.rename)
+            .setTitle(title)
             .setView(editText)
             .setPositiveButton(R.string.save) { _, _ ->
                 val newName = editText.text.toString().trim()
