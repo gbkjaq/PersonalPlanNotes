@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.R
+import com.example.plannotes.data.Record
 import com.example.plannotes.data.RecordDisplay
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -60,12 +61,12 @@ class RecordAdapter(
         }
         
         when (record.status) {
-            1 -> {
+            Record.STATUS_PROFIT -> {
                 holder.btnProfit.text = "已盈利"
                 holder.btnProfit.setBackgroundColor(Color.GREEN)
                 holder.btnAbandon.visibility = View.GONE
             }
-            2 -> {
+            Record.STATUS_ABANDON -> {
                 holder.btnAbandon.text = "已放弃"
                 holder.btnAbandon.setBackgroundColor(Color.RED)
                 holder.btnProfit.visibility = View.GONE

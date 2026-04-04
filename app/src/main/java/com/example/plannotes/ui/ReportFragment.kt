@@ -71,7 +71,6 @@ class ReportFragment : Fragment() {
     private fun loadData() {
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
-        val config = activity.dataManager.getConfig()
         
         profitRecords = mutableListOf()
         abandonRecords = mutableListOf()
