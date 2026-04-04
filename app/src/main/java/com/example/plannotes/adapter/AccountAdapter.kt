@@ -10,7 +10,7 @@ import com.example.plannotes.data.Account
 
 class AccountAdapter(
     private var accounts: List<Account>,
-    private val recordCounts: Map<String, Int>,
+    private var recordCounts: Map<String, Int>,
     private val onItemClick: (Account) -> Unit,
     private val onItemLongClick: (Account) -> Unit
 ) : RecyclerView.Adapter<AccountAdapter.ViewHolder>() {
@@ -42,6 +42,7 @@ class AccountAdapter(
     
     fun updateAccounts(newAccounts: List<Account>, newRecordCounts: Map<String, Int>) {
         accounts = newAccounts
+        recordCounts = newRecordCounts
         notifyDataSetChanged()
     }
 }
