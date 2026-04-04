@@ -11,6 +11,7 @@ data class Account(
     val id: String = UUID.randomUUID().toString(),
     var name: String = "默认账本",
     var quantity: Int = 1,
+    var currentStage: Int = 1,
     val createTime: Long = System.currentTimeMillis(),
     var updateTime: Long = System.currentTimeMillis()
 )

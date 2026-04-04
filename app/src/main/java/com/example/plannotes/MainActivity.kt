@@ -99,4 +99,24 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
+    
+    fun showChangeStageDialog(currentStage: Int, callback: (Int) -> Unit) {
+        val editText = EditText(this).apply {
+            hint = getString(R.string.stage)
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText(currentStage.toString())
+        }
+        
+        AlertDialog.Builder(this)
+            .setTitle(R.string.change_stage)
+            .setView(editText)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val stage = editText.text.toString().toIntOrNull() ?: 1
+                if (stage > 0) {
+                    callback(stage)
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
 }

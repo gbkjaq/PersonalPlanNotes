@@ -121,9 +121,10 @@ class DataManager(context: Context) {
         val account = getAccounts().find { it.id == accountId }
         val quantity = account?.quantity ?: 1
         val coefficient = config.coefficient
+        val currentStage = account?.currentStage ?: 1
         
         val records = getRecords(accountId)
-        val sortedRecords = records.sortedBy { it.createTime }
+        val sortedRecords = records.filter { it.stage <= currentStage }.sortedBy { it.createTime }
         
         var runningPrincipal = 0.0
         return sortedRecords.mapIndexed { index, record ->

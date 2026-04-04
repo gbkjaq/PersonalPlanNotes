@@ -25,6 +25,8 @@
     <string name="amount">金额</string>
     <string name="stage">阶段</string>
     <string name="remark">备注</string>
+    <string name="change_stage">修改阶段</string>
+    <string name="current_stage_format">当前阶段: %1$d</string>
     <string name="date">日期</string>
     <string name="index">序号</string>
     <string name="principal">本金</string>

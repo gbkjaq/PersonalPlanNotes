@@ -1,9 +1,12 @@
 package com.example.plannotes.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -17,8 +20,6 @@ import com.example.plannotes.data.Record
 import com.example.plannotes.data.RecordDisplay
 import com.example.plannotes.adapter.RecordAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class AccountDetailFragment : Fragment() {
@@ -38,9 +39,12 @@ class AccountDetailFragment : Fragment() {
     private var accountId: String = ""
     private var recyclerView: RecyclerView? = null
     private var adapter: RecordAdapter? = null
+    private var tvStage: TextView? = null
     private var tvTotalPrincipal: TextView? = null
     private var tvTotalProfit: TextView? = null
     private var tvTotalRevenue: TextView? = null
+    private var btnChangeStage: Button? = null
+    private var fabAdd: FloatingActionButton? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,14 +59,17 @@ class AccountDetailFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_account_detail, container, false)
     }
     
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
         recyclerView = view.findViewById(R.id.recycler_records)
+        tvStage = view.findViewById(R.id.tv_current_stage)
         tvTotalPrincipal = view.findViewById(R.id.tv_total_principal)
         tvTotalProfit = view.findViewById(R.id.tv_total_profit)
         tvTotalRevenue = view.findViewById(R.id.tv_total_revenue)
-        val fabAdd: FloatingActionButton? = view.findViewById(R.id.fab_add_record)
+        btnChangeStage = view.findViewById(R.id.btn_change_stage)
+        fabAdd = view.findViewById(R.id.fab_add_record)
         
         adapter = RecordAdapter(
             records = emptyList(),
@@ -77,11 +84,58 @@ class AccountDetailFragment : Fragment() {
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         recyclerView?.adapter = adapter
         
+        setupDraggableFab(view)
+        
+        btnChangeStage?.setOnClickListener {
+            val activity = activity as? MainActivity ?: return@setOnClickListener
+            val account = activity.dataManager.getAccounts().find { it.id == accountId }
+            activity.showChangeStageDialog(account?.currentStage ?: 1) { newStage ->
+                account?.currentStage = newStage
+                activity.dataManager.updateAccount(account!!)
+                loadData()
+            }
+        }
+        
         fabAdd?.setOnClickListener {
             showAddRecordDialog()
         }
         
         loadData()
+    }
+    
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupDraggableFab(rootView: View) {
+        var dX = 0f
+        var dY = 0f
+        var lastAction = 0
+        
+        fabAdd?.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    dX = view.x - event.rawX
+                    dY = view.y - event.rawY
+                    lastAction = MotionEvent.ACTION_DOWN
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val newX = event.rawX + dX
+                    val newY = event.rawY + dY
+                    
+                    val parent = view.parent as View
+                    val maxX = parent.width - view.width.toFloat()
+                    val maxY = parent.height - view.height.toFloat()
+                    
+                    view.x = newX.coerceIn(0f, maxX)
+                    view.y = newY.coerceIn(0f, maxY)
+                    lastAction = MotionEvent.ACTION_MOVE
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    lastAction == MotionEvent.ACTION_MOVE
+                }
+                else -> false
+            }
+        }
     }
     
     override fun onResume() {
@@ -93,8 +147,11 @@ class AccountDetailFragment : Fragment() {
         val activity = activity as? MainActivity ?: return
         val accountWithRecords = activity.dataManager.getAccountWithRecords(accountId)
         val records = accountWithRecords.records
+        val account = accountWithRecords.account
         
         adapter?.updateRecords(records)
+        
+        tvStage?.text = getString(R.string.current_stage_format, account.currentStage)
         
         val lastRecord = records.lastOrNull()
         tvTotalPrincipal?.text = formatCurrency(lastRecord?.principal ?: 0.0)
@@ -103,7 +160,10 @@ class AccountDetailFragment : Fragment() {
     }
     
     private fun showAddRecordDialog() {
+        val activity = activity as? MainActivity ?: return
         val context = requireContext()
+        val account = activity.dataManager.getAccounts().find { it.id == accountId }
+        
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(50, 20, 50, 20)
@@ -117,7 +177,7 @@ class AccountDetailFragment : Fragment() {
         val etStage = EditText(context).apply {
             hint = getString(R.string.stage)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            setText("1")
+            setText((account?.currentStage ?: 1).toString())
         }
         
         val etRemark = EditText(context).apply {
@@ -134,7 +194,6 @@ class AccountDetailFragment : Fragment() {
             .setPositiveButton(R.string.save) { _, _ ->
                 val amountStr = etAmount.text.toString()
                 if (amountStr.isNotEmpty()) {
-                    val activity = activity as? MainActivity ?: return@setPositiveButton
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
                     val stage = etStage.text.toString().toIntOrNull() ?: 1
                     val remark = etRemark.text.toString()
@@ -149,6 +208,7 @@ class AccountDetailFragment : Fragment() {
     
     private fun showEditRecordDialog(recordDisplay: RecordDisplay) {
         val context = requireContext()
+        
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(50, 20, 50, 20)
