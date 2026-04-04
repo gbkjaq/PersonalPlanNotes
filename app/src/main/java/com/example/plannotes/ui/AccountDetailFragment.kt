@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.MainActivity
 import com.example.plannotes.R
+import com.example.plannotes.data.Record
 import com.example.plannotes.data.RecordDisplay
 import com.example.plannotes.adapter.RecordAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
