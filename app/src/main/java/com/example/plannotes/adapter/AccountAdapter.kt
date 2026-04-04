@@ -51,8 +51,19 @@ class AccountAdapter(
         val count = summary?.recordCount ?: 0
         holder.tvRecordCount.text = "数量: ${account.quantity} | $count 条记录"
         
-        holder.btnProfit.setOnClickListener { onProfitClick(account) }
-        holder.btnAbandon.setOnClickListener { onAbandonClick(account) }
+        if (account.currentStage == 0) {
+            holder.btnProfit.isEnabled = false
+            holder.btnAbandon.isEnabled = false
+            holder.btnProfit.alpha = 0.5f
+            holder.btnAbandon.alpha = 0.5f
+        } else {
+            holder.btnProfit.isEnabled = true
+            holder.btnAbandon.isEnabled = true
+            holder.btnProfit.alpha = 1.0f
+            holder.btnAbandon.alpha = 1.0f
+            holder.btnProfit.setOnClickListener { onProfitClick(account) }
+            holder.btnAbandon.setOnClickListener { onAbandonClick(account) }
+        }
         
         holder.itemView.setOnClickListener { onItemClick(account) }
         holder.itemView.setOnLongClickListener {

@@ -121,10 +121,9 @@ class DataManager(context: Context) {
         val account = getAccounts().find { it.id == accountId }
         val quantity = account?.quantity ?: 1
         val coefficient = config.coefficient
-        val currentStage = account?.currentStage ?: 1
         
         val records = getRecords(accountId)
-        val sortedRecords = records.filter { it.stage <= currentStage }.sortedBy { it.createTime }
+        val sortedRecords = records.sortedBy { it.createTime }
         
         var runningPrincipal = 0.0
         return sortedRecords.mapIndexed { index, record ->
@@ -133,6 +132,21 @@ class DataManager(context: Context) {
             } else {
                 record.amount * quantity + runningPrincipal
             }
+            val profit = record.amount * coefficient
+            val totalProfit = profit - principal
+            runningPrincipal = principal
+            
+            RecordDisplay(
+                index = index + 1,
+                record = record,
+                principal = principal,
+                profit = profit,
+                totalProfit = totalProfit,
+                isProfit = record.status == Record.STATUS_PROFIT,
+                isAbandon = record.status == Record.STATUS_ABANDON
+            )
+        }
+    }
             val profit = record.amount * coefficient
             val totalProfit = profit - principal
             runningPrincipal = principal

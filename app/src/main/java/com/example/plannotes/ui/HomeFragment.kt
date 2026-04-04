@@ -51,9 +51,11 @@ class HomeFragment : Fragment() {
             },
             onProfitClick = { account ->
                 activity.showWholeAccountProfitDialog(account)
+                refreshData()
             },
             onAbandonClick = { account ->
                 activity.showWholeAccountAbandonDialog(account)
+                refreshData()
             }
         )
         

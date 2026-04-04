@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.example.plannotes.data.Account
 import com.example.plannotes.data.Config
 import com.example.plannotes.data.Record
@@ -40,6 +41,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
         
         dataManager = DataManager(this)
         
@@ -237,13 +241,15 @@ class MainActivity : AppCompatActivity() {
     fun showWholeAccountProfitDialog(account: Account) {
         AlertDialog.Builder(this)
             .setTitle(R.string.profit_action)
-            .setMessage("将账本「${account.name}」所有记录标记为盈利？")
+            .setMessage("将账本「${account.name}」所有记录标记为盈利？计划将重置为0阶段。")
             .setPositiveButton(R.string.confirm) { _, _ ->
                 val records = dataManager.getRecords(account.id)
                 for (record in records) {
                     record.status = com.example.plannotes.data.Record.STATUS_PROFIT
                     dataManager.updateRecord(account.id, record)
                 }
+                account.currentStage = 0
+                dataManager.updateAccount(account)
                 Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton(R.string.cancel, null)
@@ -253,13 +259,15 @@ class MainActivity : AppCompatActivity() {
     fun showWholeAccountAbandonDialog(account: Account) {
         AlertDialog.Builder(this)
             .setTitle(R.string.abandon)
-            .setMessage("将账本「${account.name}」所有记录标记为放弃？")
+            .setMessage("将账本「${account.name}」所有记录标记为放弃？计划将重置为0阶段。")
             .setPositiveButton(R.string.confirm) { _, _ ->
                 val records = dataManager.getRecords(account.id)
                 for (record in records) {
                     record.status = com.example.plannotes.data.Record.STATUS_ABANDON
                     dataManager.updateRecord(account.id, record)
                 }
+                account.currentStage = 0
+                dataManager.updateAccount(account)
                 Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton(R.string.cancel, null)
