@@ -14,19 +14,19 @@
 
         <TextView
             android:id="@+id/tv_index"
-            android:layout_width="30dp"
+            android:layout_width="25dp"
             android:layout_height="wrap_content"
             android:textSize="12sp" />
 
         <TextView
             android:id="@+id/tv_stage"
-            android:layout_width="40dp"
+            android:layout_width="35dp"
             android:layout_height="wrap_content"
             android:textSize="12sp" />
 
         <TextView
             android:id="@+id/tv_date"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:textSize="10sp" />
 
@@ -60,13 +60,46 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_remark"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="130dp"
-        android:textSize="10sp"
-        android:textColor="@android:color/darker_gray"
-        android:visibility="gone" />
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="60dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_profit"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="@string/profit_action"
+            android:textSize="10sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp" />
+
+        <Button
+            android:id="@+id/btn_abandon"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/abandon"
+            android:textSize="10sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp" />
+
+        <TextView
+            android:id="@+id/tv_remark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textSize="10sp"
+            android:textColor="@android:color/darker_gray"
+            android:visibility="gone" />
+
+    </LinearLayout>
 
 </LinearLayout>

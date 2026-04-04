@@ -7,16 +7,21 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.R
 import com.example.plannotes.data.Account
+import com.example.plannotes.data.AccountSummary
+import java.util.Locale
 
 class AccountAdapter(
     private var accounts: List<Account>,
-    private var recordCounts: Map<String, Int>,
+    private var summaries: Map<String, AccountSummary>,
     private val onItemClick: (Account) -> Unit,
     private val onItemLongClick: (Account) -> Unit
 ) : RecyclerView.Adapter<AccountAdapter.ViewHolder>() {
     
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvName: TextView = view.findViewById(R.id.tv_account_name)
+        val tvStage: TextView = view.findViewById(R.id.tv_stage)
+        val tvPrincipal: TextView = view.findViewById(R.id.tv_principal)
+        val tvProfit: TextView = view.findViewById(R.id.tv_profit)
         val tvRecordCount: TextView = view.findViewById(R.id.tv_record_count)
     }
     
@@ -28,9 +33,19 @@ class AccountAdapter(
     
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val account = accounts[position]
+        val summary = summaries[account.id]
+        
         holder.tvName.text = account.name
-        val count = recordCounts[account.id] ?: 0
+        holder.tvStage.text = "阶段: ${account.currentStage}"
+        
+        val principal = summary?.principal ?: 0.0
+        val totalProfit = summary?.totalProfit ?: 0.0
+        holder.tvPrincipal.text = "本金: ${formatCurrency(principal)}"
+        holder.tvProfit.text = "盈利: ${formatCurrency(totalProfit)}"
+        
+        val count = summary?.recordCount ?: 0
         holder.tvRecordCount.text = "数量: ${account.quantity} | $count 条记录"
+        
         holder.itemView.setOnClickListener { onItemClick(account) }
         holder.itemView.setOnLongClickListener {
             onItemLongClick(account)
@@ -40,9 +55,13 @@ class AccountAdapter(
     
     override fun getItemCount() = accounts.size
     
-    fun updateAccounts(newAccounts: List<Account>, newRecordCounts: Map<String, Int>) {
+    fun updateAccounts(newAccounts: List<Account>, newSummaries: Map<String, AccountSummary>) {
         accounts = newAccounts
-        recordCounts = newRecordCounts
+        summaries = newSummaries
         notifyDataSetChanged()
+    }
+    
+    private fun formatCurrency(amount: Double): String {
+        return String.format(Locale.getDefault(), "%.2f", amount)
     }
 }

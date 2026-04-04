@@ -1,8 +1,10 @@
 package com.example.plannotes.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.R
@@ -14,7 +16,9 @@ import java.util.Locale
 class RecordAdapter(
     private var records: List<RecordDisplay>,
     private val onItemClick: (RecordDisplay) -> Unit,
-    private val onItemLongClick: (RecordDisplay) -> Unit
+    private val onItemLongClick: (RecordDisplay) -> Unit,
+    private val onProfitClick: (RecordDisplay) -> Unit,
+    private val onAbandonClick: (RecordDisplay) -> Unit
 ) : RecyclerView.Adapter<RecordAdapter.ViewHolder>() {
     
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -26,6 +30,8 @@ class RecordAdapter(
         val tvProfit: TextView = view.findViewById(R.id.tv_profit)
         val tvTotalProfit: TextView = view.findViewById(R.id.tv_total_profit)
         val tvRemark: TextView = view.findViewById(R.id.tv_remark)
+        val btnProfit: Button = view.findViewById(R.id.btn_profit)
+        val btnAbandon: Button = view.findViewById(R.id.btn_abandon)
     }
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,6 +45,7 @@ class RecordAdapter(
         val record = recordDisplay.record
         
         holder.tvIndex.text = recordDisplay.index.toString()
+        holder.tvStage.text = record.stage.toString()
         holder.tvDate.text = formatDate(record.createTime)
         holder.tvAmount.text = formatCurrency(record.amount)
         holder.tvPrincipal.text = formatCurrency(recordDisplay.principal)
@@ -51,6 +58,30 @@ class RecordAdapter(
         } else {
             holder.tvRemark.visibility = View.GONE
         }
+        
+        when (record.status) {
+            1 -> {
+                holder.btnProfit.text = "已盈利"
+                holder.btnProfit.setBackgroundColor(Color.GREEN)
+                holder.btnAbandon.visibility = View.GONE
+            }
+            2 -> {
+                holder.btnAbandon.text = "已放弃"
+                holder.btnAbandon.setBackgroundColor(Color.RED)
+                holder.btnProfit.visibility = View.GONE
+            }
+            else -> {
+                holder.btnProfit.text = holder.itemView.context.getString(R.string.profit_action)
+                holder.btnProfit.setBackgroundColor(Color.parseColor("#4CAF50"))
+                holder.btnProfit.visibility = View.VISIBLE
+                holder.btnAbandon.text = holder.itemView.context.getString(R.string.abandon)
+                holder.btnAbandon.setBackgroundColor(Color.parseColor("#F44336"))
+                holder.btnAbandon.visibility = View.VISIBLE
+            }
+        }
+        
+        holder.btnProfit.setOnClickListener { onProfitClick(recordDisplay) }
+        holder.btnAbandon.setOnClickListener { onAbandonClick(recordDisplay) }
         
         holder.itemView.setOnClickListener { onItemClick(recordDisplay) }
         holder.itemView.setOnLongClickListener {
@@ -67,7 +98,7 @@ class RecordAdapter(
     }
     
     private fun formatDate(timestamp: Long): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        val sdf = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault())
         return sdf.format(Date(timestamp))
     }
     

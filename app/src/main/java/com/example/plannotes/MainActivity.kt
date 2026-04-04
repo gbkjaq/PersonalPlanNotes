@@ -10,6 +10,7 @@ import com.example.plannotes.data.DataManager
 import com.example.plannotes.ui.HomeFragment
 import com.example.plannotes.ui.AccountDetailFragment
 import com.example.plannotes.ui.SettingsFragment
+import com.example.plannotes.ui.ReportFragment
 import android.widget.EditText
 import android.widget.LinearLayout
 
@@ -37,6 +38,13 @@ class MainActivity : AppCompatActivity() {
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_report -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, ReportFragment.newInstance())
+                    .addToBackStack(null)
+                    .commit()
+                true
+            }
             R.id.action_settings -> {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, SettingsFragment())

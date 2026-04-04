@@ -39,6 +39,14 @@
     <string name="total_profit">总收益</string>
     <string name="total_revenue">净利润</string>
     <string name="current_config">当前配置：数量=%1$d，系数=%2$d</string>
+    <string name="profit_action">盈利</string>
+    <string name="abandon">放弃</string>
+    <string name="report">计划报表</string>
+    <string name="profit_record">盈利记录</string>
+    <string name="abandon_record">放弃记录</string>
+    <string name="no_records">暂无记录</string>
+    <string name="profit_confirm">标记为盈利？</string>
+    <string name="abandon_confirm">标记为放弃？</string>
     
     <!-- Settings -->
     <string name="global_settings">全局设置</string>

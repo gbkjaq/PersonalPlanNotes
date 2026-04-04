@@ -142,7 +142,9 @@ class DataManager(context: Context) {
                 record = record,
                 principal = principal,
                 profit = profit,
-                totalProfit = totalProfit
+                totalProfit = totalProfit,
+                isProfit = record.status == Record.STATUS_PROFIT,
+                isAbandon = record.status == Record.STATUS_ABANDON
             )
         }
     }
@@ -153,5 +155,23 @@ class DataManager(context: Context) {
         val config = getConfig()
         val records = getRecordsWithDisplay(accountId, config)
         return AccountWithRecords(account, records)
+    }
+    
+    fun getAccountSummaries(): Map<String, AccountSummary> {
+        val accounts = getAccounts()
+        val config = getConfig()
+        val summaries = mutableMapOf<String, AccountSummary>()
+        
+        for (account in accounts) {
+            val records = getRecordsWithDisplay(account.id, config)
+            val lastRecord = records.lastOrNull()
+            summaries[account.id] = AccountSummary(
+                principal = lastRecord?.principal ?: 0.0,
+                totalProfit = lastRecord?.totalProfit ?: 0.0,
+                recordCount = records.size
+            )
+        }
+        
+        return summaries
     }
 }

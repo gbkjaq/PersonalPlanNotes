@@ -38,11 +38,11 @@ class HomeFragment : Fragment() {
         
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
-        val recordCounts = accounts.associate { it.id to activity.dataManager.getRecords(it.id).size }
+        val summaries = activity.dataManager.getAccountSummaries()
         
         adapter = AccountAdapter(
             accounts = accounts,
-            recordCounts = recordCounts,
+            summaries = summaries,
             onItemClick = { account ->
                 (activity as MainActivity).showAccountDetailFragment(account.id)
             },
@@ -105,8 +105,8 @@ class HomeFragment : Fragment() {
     private fun refreshData() {
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
-        val recordCounts = accounts.associate { it.id to activity.dataManager.getRecords(it.id).size }
-        adapter?.updateAccounts(accounts, recordCounts)
+        val summaries = activity.dataManager.getAccountSummaries()
+        adapter?.updateAccounts(accounts, summaries)
     }
     
     private fun showAccountOptions(account: Account) {
