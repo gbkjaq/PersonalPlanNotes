@@ -12,6 +12,7 @@ import com.example.plannotes.MainActivity
 import com.example.plannotes.R
 import com.example.plannotes.adapter.ReportAdapter
 import com.example.plannotes.data.Record
+import com.example.plannotes.data.ReportItem
 import com.google.android.material.tabs.TabLayout
 import java.util.Locale
 
@@ -119,8 +120,3 @@ class ReportFragment : Fragment() {
         return String.format(Locale.getDefault(), "%.2f", amount)
     }
 }
-
-data class ReportItem(
-    val accountName: String,
-    val record: Record
-)

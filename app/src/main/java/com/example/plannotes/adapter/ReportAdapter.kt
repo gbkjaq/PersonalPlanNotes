@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.R
+import com.example.plannotes.data.ReportItem
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
