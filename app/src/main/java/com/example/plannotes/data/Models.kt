@@ -36,7 +36,9 @@ data class RecordDisplay(
     val record: Record,
     val principal: Double,
     val profit: Double,
-    val totalProfit: Double
+    val totalProfit: Double,
+    val isProfit: Boolean = false,
+    val isAbandon: Boolean = false
 )
 
 data class AccountWithRecords(
