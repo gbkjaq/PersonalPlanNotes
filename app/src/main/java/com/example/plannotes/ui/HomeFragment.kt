@@ -1,7 +1,9 @@
 package com.example.plannotes.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -18,6 +20,7 @@ class HomeFragment : Fragment() {
     
     private var recyclerView: RecyclerView? = null
     private var adapter: AccountAdapter? = null
+    private var fabAdd: FloatingActionButton? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,7 +34,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         recyclerView = view.findViewById(R.id.recycler_accounts)
-        val fabAdd: FloatingActionButton? = view.findViewById(R.id.fab_add_account)
+        fabAdd = view.findViewById(R.id.fab_add_account)
         
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
@@ -51,8 +54,46 @@ class HomeFragment : Fragment() {
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         recyclerView?.adapter = adapter
         
+        setupDraggableFab(view)
+        
         fabAdd?.setOnClickListener {
             addNewAccount()
+        }
+    }
+    
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupDraggableFab(rootView: View) {
+        var dX = 0f
+        var dY = 0f
+        var totalMoved = 0f
+        
+        fabAdd?.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    dX = view.x - event.rawX
+                    dY = view.y - event.rawY
+                    totalMoved = 0f
+                    false
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val newX = event.rawX + dX
+                    val newY = event.rawY + dY
+                    
+                    totalMoved += kotlin.math.abs(event.rawX - (view.x - dX)) + kotlin.math.abs(event.rawY - (view.y - dY))
+                    
+                    val parent = view.parent as View
+                    val maxX = parent.width - view.width.toFloat()
+                    val maxY = parent.height - view.height.toFloat()
+                    
+                    view.x = newX.coerceIn(0f, maxX)
+                    view.y = newY.coerceIn(0f, maxY)
+                    totalMoved > 10f
+                }
+                MotionEvent.ACTION_UP -> {
+                    totalMoved > 10f
+                }
+                else -> false
+            }
         }
     }
     

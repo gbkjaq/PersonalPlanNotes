@@ -44,4 +44,13 @@
     <string name="global_settings">全局设置</string>
     <string name="quantity">数量</string>
     <string name="coefficient">系数</string>
+    <string name="backup_restore">备份与恢复</string>
+    <string name="export_data">导出数据</string>
+    <string name="import_data">导入数据</string>
+    <string name="export_success">导出成功</string>
+    <string name="import_success">导入成功</string>
+    <string name="export_failed">导出失败</string>
+    <string name="import_failed">导入失败</string>
+    <string name="import_confirm">导入将覆盖现有数据，确定继续吗？</string>
+    <string name="confirm">确定</string>
 </resources>

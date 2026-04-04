@@ -107,19 +107,21 @@ class AccountDetailFragment : Fragment() {
     private fun setupDraggableFab(rootView: View) {
         var dX = 0f
         var dY = 0f
-        var lastAction = 0
+        var totalMoved = 0f
         
         fabAdd?.setOnTouchListener { view, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     dX = view.x - event.rawX
                     dY = view.y - event.rawY
-                    lastAction = MotionEvent.ACTION_DOWN
-                    true
+                    totalMoved = 0f
+                    false
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val newX = event.rawX + dX
                     val newY = event.rawY + dY
+                    
+                    totalMoved += kotlin.math.abs(event.rawX - (view.x - dX)) + kotlin.math.abs(event.rawY - (view.y - dY))
                     
                     val parent = view.parent as View
                     val maxX = parent.width - view.width.toFloat()
@@ -127,11 +129,10 @@ class AccountDetailFragment : Fragment() {
                     
                     view.x = newX.coerceIn(0f, maxX)
                     view.y = newY.coerceIn(0f, maxY)
-                    lastAction = MotionEvent.ACTION_MOVE
-                    true
+                    totalMoved > 10f
                 }
                 MotionEvent.ACTION_UP -> {
-                    lastAction == MotionEvent.ACTION_MOVE
+                    totalMoved > 10f
                 }
                 else -> false
             }
@@ -153,10 +154,20 @@ class AccountDetailFragment : Fragment() {
         
         tvStage?.text = getString(R.string.current_stage_format, account.currentStage)
         
-        val lastRecord = records.lastOrNull()
-        tvTotalPrincipal?.text = formatCurrency(lastRecord?.principal ?: 0.0)
-        tvTotalProfit?.text = formatCurrency(lastRecord?.profit ?: 0.0)
-        tvTotalRevenue?.text = formatCurrency(lastRecord?.totalProfit ?: 0.0)
+        var totalPrincipal = 0.0
+        var totalProfit = 0.0
+        var totalRevenue = 0.0
+        
+        if (records.isNotEmpty()) {
+            val lastRecord = records.last()
+            totalPrincipal = lastRecord.principal
+            totalProfit = lastRecord.profit
+            totalRevenue = lastRecord.totalProfit
+        }
+        
+        tvTotalPrincipal?.text = formatCurrency(totalPrincipal)
+        tvTotalProfit?.text = formatCurrency(totalProfit)
+        tvTotalRevenue?.text = formatCurrency(totalRevenue)
     }
     
     private fun showAddRecordDialog() {
