@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">个人计划笔记</string>
+    
+    <!-- Common -->
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="delete">删除</string>
+    <string name="rename">重命名</string>
+    <string name="settings">设置</string>
+    <string name="deleted">已删除</string>
+    <string name="saved">已保存</string>
+    <string name="fill_all_fields">请填写所有字段</string>
+    <string name="invalid_input">输入无效</string>
+    <string name="delete_confirm">确定要删除吗？</string>
+    
+    <!-- Home -->
+    <string name="accounts">账本列表</string>
+    <string name="add_account">添加账本</string>
+    
+    <!-- Account Detail -->
+    <string name="add_record">添加记录</string>
+    <string name="edit_record">编辑记录</string>
+    <string name="amount">金额</string>
+    <string name="remark">备注</string>
+    <string name="date">日期</string>
+    <string name="index">序号</string>
+    <string name="principal">本金</string>
+    <string name="profit">收益</string>
+    <string name="total_profit_short">总收益</string>
+    
+    <!-- Summary -->
+    <string name="summary">汇总</string>
+    <string name="total_principal">总本金</string>
+    <string name="total_profit">总收益</string>
+    <string name="total_revenue">净利润</string>
+    <string name="current_config">当前配置：数量=%1$d，系数=%2$d</string>
+    
+    <!-- Settings -->
+    <string name="global_settings">全局设置</string>
+    <string name="quantity">数量</string>
+    <string name="coefficient">系数</string>
+</resources>

@@ -1,0 +1,35 @@
+package com.example.plannotes.data
+
+import java.util.UUID
+
+data class Config(
+    var quantity: Int = 1,
+    var coefficient: Int = 47
+)
+
+data class Account(
+    val id: String = UUID.randomUUID().toString(),
+    var name: String = "默认账本",
+    val createTime: Long = System.currentTimeMillis(),
+    var updateTime: Long = System.currentTimeMillis()
+)
+
+data class Record(
+    val id: String = UUID.randomUUID().toString(),
+    var amount: Double = 0.0,
+    var remark: String = "",
+    val createTime: Long = System.currentTimeMillis()
+)
+
+data class RecordDisplay(
+    val index: Int,
+    val record: Record,
+    val principal: Double,
+    val profit: Double,
+    val totalProfit: Double
+)
+
+data class AccountWithRecords(
+    val account: Account,
+    val records: List<RecordDisplay>
+)
