@@ -89,8 +89,9 @@ class HomeFragment : Fragment() {
     
     private fun renameAccount(account: Account) {
         val activity = activity as? MainActivity ?: return
-        activity.showRenameDialog(account.name) { newName ->
+        activity.showRenameDialog(account.name, account.quantity) { newName, newQuantity ->
             account.name = newName
+            account.quantity = newQuantity
             activity.dataManager.updateAccount(account)
             refreshData()
         }
@@ -107,9 +108,9 @@ class HomeFragment : Fragment() {
     
     private fun addNewAccount() {
         val activity = activity as? MainActivity ?: return
-        activity.showRenameDialog("") { name ->
+        activity.showRenameDialog("", 1) { name, quantity ->
             if (name.isNotEmpty()) {
-                val account = Account(name = name)
+                val account = Account(name = name, quantity = quantity)
                 activity.dataManager.addAccount(account)
                 refreshData()
             }

@@ -114,11 +114,18 @@ class AccountDetailFragment : Fragment() {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
         
+        val etStage = EditText(context).apply {
+            hint = getString(R.string.stage)
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText("1")
+        }
+        
         val etRemark = EditText(context).apply {
             hint = getString(R.string.remark)
         }
         
         layout.addView(etAmount)
+        layout.addView(etStage)
         layout.addView(etRemark)
         
         androidx.appcompat.app.AlertDialog.Builder(context)
@@ -129,8 +136,9 @@ class AccountDetailFragment : Fragment() {
                 if (amountStr.isNotEmpty()) {
                     val activity = activity as? MainActivity ?: return@setPositiveButton
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
+                    val stage = etStage.text.toString().toIntOrNull() ?: 1
                     val remark = etRemark.text.toString()
-                    val record = Record(amount = amount, remark = remark)
+                    val record = Record(amount = amount, stage = stage, remark = remark)
                     activity.dataManager.addRecord(accountId, record)
                     loadData()
                 }
@@ -152,12 +160,19 @@ class AccountDetailFragment : Fragment() {
             setText(recordDisplay.record.amount.toString())
         }
         
+        val etStage = EditText(context).apply {
+            hint = getString(R.string.stage)
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText(recordDisplay.record.stage.toString())
+        }
+        
         val etRemark = EditText(context).apply {
             hint = getString(R.string.remark)
             setText(recordDisplay.record.remark)
         }
         
         layout.addView(etAmount)
+        layout.addView(etStage)
         layout.addView(etRemark)
         
         androidx.appcompat.app.AlertDialog.Builder(context)
@@ -168,10 +183,12 @@ class AccountDetailFragment : Fragment() {
                 val amountStr = etAmount.text.toString()
                 if (amountStr.isNotEmpty()) {
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
+                    val stage = etStage.text.toString().toIntOrNull() ?: 1
                     val remark = etRemark.text.toString()
                     val record = Record(
                         id = recordDisplay.record.id,
                         amount = amount,
+                        stage = stage,
                         remark = remark,
                         createTime = recordDisplay.record.createTime
                     )

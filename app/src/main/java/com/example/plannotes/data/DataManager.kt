@@ -118,17 +118,21 @@ class DataManager(context: Context) {
     }
     
     fun getRecordsWithDisplay(accountId: String, config: Config): List<RecordDisplay> {
+        val account = getAccounts().find { it.id == accountId }
+        val quantity = account?.quantity ?: 1
+        val coefficient = config.coefficient
+        
         val records = getRecords(accountId)
         val sortedRecords = records.sortedBy { it.createTime }
         
         var runningPrincipal = 0.0
         return sortedRecords.mapIndexed { index, record ->
             val principal = if (index == 0) {
-                record.amount * config.quantity
+                record.amount * quantity
             } else {
-                record.amount * config.quantity + runningPrincipal
+                record.amount * quantity + runningPrincipal
             }
-            val profit = record.amount * config.coefficient
+            val profit = record.amount * coefficient
             val totalProfit = profit - principal
             runningPrincipal = principal
             

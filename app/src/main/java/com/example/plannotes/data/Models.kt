@@ -10,6 +10,7 @@ data class Config(
 data class Account(
     val id: String = UUID.randomUUID().toString(),
     var name: String = "默认账本",
+    var quantity: Int = 1,
     val createTime: Long = System.currentTimeMillis(),
     var updateTime: Long = System.currentTimeMillis()
 )
@@ -17,6 +18,7 @@ data class Account(
 data class Record(
     val id: String = UUID.randomUUID().toString(),
     var amount: Double = 0.0,
+    var stage: Int = 1,
     var remark: String = "",
     val createTime: Long = System.currentTimeMillis()
 )

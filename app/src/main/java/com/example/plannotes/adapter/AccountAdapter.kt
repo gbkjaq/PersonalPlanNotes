@@ -30,7 +30,7 @@ class AccountAdapter(
         val account = accounts[position]
         holder.tvName.text = account.name
         val count = recordCounts[account.id] ?: 0
-        holder.tvRecordCount.text = "$count 条记录"
+        holder.tvRecordCount.text = "数量: ${account.quantity} | $count 条记录"
         holder.itemView.setOnClickListener { onItemClick(account) }
         holder.itemView.setOnLongClickListener {
             onItemLongClick(account)

@@ -11,6 +11,7 @@ import com.example.plannotes.ui.HomeFragment
 import com.example.plannotes.ui.AccountDetailFragment
 import com.example.plannotes.ui.SettingsFragment
 import android.widget.EditText
+import android.widget.LinearLayout
 
 class MainActivity : AppCompatActivity() {
     
@@ -54,20 +55,36 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
     
-    fun showRenameDialog(currentName: String, callback: (String) -> Unit) {
+    fun showRenameDialog(currentName: String, currentQuantity: Int = 1, callback: (String, Int) -> Unit) {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(50, 20, 50, 20)
+        }
+        
         val editText = EditText(this).apply {
+            hint = getString(R.string.account_name)
             setText(currentName)
         }
+        
+        val etQuantity = EditText(this).apply {
+            hint = getString(R.string.quantity)
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText(currentQuantity.toString())
+        }
+        
+        layout.addView(editText)
+        layout.addView(etQuantity)
         
         val titleRes = if (currentName.isEmpty()) R.string.add_account else R.string.rename
         
         AlertDialog.Builder(this)
             .setTitle(titleRes)
-            .setView(editText)
+            .setView(layout)
             .setPositiveButton(R.string.save) { _, _ ->
                 val newName = editText.text.toString().trim()
+                val quantity = etQuantity.text.toString().toIntOrNull() ?: 1
                 if (newName.isNotEmpty()) {
-                    callback(newName)
+                    callback(newName, quantity)
                 }
             }
             .setNegativeButton(R.string.cancel, null)
