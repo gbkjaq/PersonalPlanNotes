@@ -18,8 +18,8 @@ class HomeFragment : Fragment() {
     
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AccountAdapter
+    
     private val dataManager get() = (activity as MainActivity).dataManager
-    private val accounts get() = dataManager.getAccounts()
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +36,7 @@ class HomeFragment : Fragment() {
         val fabAdd: FloatingActionButton = view.findViewById(R.id.fab_add_account)
         
         adapter = AccountAdapter(
-            accounts = accounts,
+            accounts = dataManager.getAccounts(),
             recordCounts = getRecordCounts(),
             onItemClick = { account ->
                 (activity as MainActivity).showAccountDetailFragment(account.id)
@@ -56,11 +56,11 @@ class HomeFragment : Fragment() {
     
     override fun onResume() {
         super.onResume()
-        adapter.updateAccounts(accounts, getRecordCounts())
+        adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
     }
     
     private fun getRecordCounts(): Map<String, Int> {
-        return accounts.associate { it.id to dataManager.getRecords(it.id).size }
+        return dataManager.getAccounts().associate { it.id to dataManager.getRecords(it.id).size }
     }
     
     private fun showAccountOptions(account: Account) {
@@ -84,14 +84,14 @@ class HomeFragment : Fragment() {
         (activity as MainActivity).showRenameDialog(account.id, account.name) { newName ->
             account.name = newName
             dataManager.updateAccount(account)
-            adapter.updateAccounts(accounts, getRecordCounts())
+            adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
         }
     }
     
     private fun deleteAccount(account: Account) {
         (activity as MainActivity).showDeleteConfirmDialog {
             dataManager.deleteAccount(account.id)
-            adapter.updateAccounts(accounts, getRecordCounts())
+            adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
             Toast.makeText(requireContext(), R.string.deleted, Toast.LENGTH_SHORT).show()
         }
     }
@@ -101,7 +101,7 @@ class HomeFragment : Fragment() {
             if (name.isNotEmpty()) {
                 val account = Account(name = name)
                 dataManager.addAccount(account)
-                adapter.updateAccounts(accounts, getRecordCounts())
+                adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
             }
         }
     }
