@@ -3,6 +3,7 @@ package com.example.plannotes.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.R
@@ -14,7 +15,9 @@ class AccountAdapter(
     private var accounts: List<Account>,
     private var summaries: Map<String, AccountSummary>,
     private val onItemClick: (Account) -> Unit,
-    private val onItemLongClick: (Account) -> Unit
+    private val onItemLongClick: (Account) -> Unit,
+    private val onProfitClick: (Account) -> Unit,
+    private val onAbandonClick: (Account) -> Unit
 ) : RecyclerView.Adapter<AccountAdapter.ViewHolder>() {
     
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -23,6 +26,8 @@ class AccountAdapter(
         val tvPrincipal: TextView = view.findViewById(R.id.tv_principal)
         val tvProfit: TextView = view.findViewById(R.id.tv_profit)
         val tvRecordCount: TextView = view.findViewById(R.id.tv_record_count)
+        val btnProfit: Button = view.findViewById(R.id.btn_profit)
+        val btnAbandon: Button = view.findViewById(R.id.btn_abandon)
     }
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -45,6 +50,9 @@ class AccountAdapter(
         
         val count = summary?.recordCount ?: 0
         holder.tvRecordCount.text = "数量: ${account.quantity} | $count 条记录"
+        
+        holder.btnProfit.setOnClickListener { onProfitClick(account) }
+        holder.btnAbandon.setOnClickListener { onAbandonClick(account) }
         
         holder.itemView.setOnClickListener { onItemClick(account) }
         holder.itemView.setOnLongClickListener {

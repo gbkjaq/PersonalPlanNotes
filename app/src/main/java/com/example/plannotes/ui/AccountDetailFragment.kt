@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.MainActivity
 import com.example.plannotes.R
-import com.example.plannotes.data.Record
 import com.example.plannotes.data.RecordDisplay
 import com.example.plannotes.adapter.RecordAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -78,12 +77,6 @@ class AccountDetailFragment : Fragment() {
             },
             onItemLongClick = { recordDisplay ->
                 showDeleteRecordDialog(recordDisplay)
-            },
-            onProfitClick = { recordDisplay ->
-                showProfitConfirmDialog(recordDisplay)
-            },
-            onAbandonClick = { recordDisplay ->
-                showAbandonConfirmDialog(recordDisplay)
             }
         )
         
@@ -287,36 +280,6 @@ class AccountDetailFragment : Fragment() {
                 activity.dataManager.deleteRecord(accountId, recordDisplay.record.id)
                 loadData()
                 Toast.makeText(requireContext(), R.string.deleted, Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-    
-    private fun showProfitConfirmDialog(recordDisplay: RecordDisplay) {
-        val activity = activity as? MainActivity ?: return
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle(R.string.profit_action)
-            .setMessage(R.string.profit_confirm)
-            .setPositiveButton(R.string.confirm) { _, _ ->
-                val record = recordDisplay.record
-                record.status = com.example.plannotes.data.Record.STATUS_PROFIT
-                activity.dataManager.updateRecord(accountId, record)
-                loadData()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-    
-    private fun showAbandonConfirmDialog(recordDisplay: RecordDisplay) {
-        val activity = activity as? MainActivity ?: return
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle(R.string.abandon)
-            .setMessage(R.string.abandon_confirm)
-            .setPositiveButton(R.string.confirm) { _, _ ->
-                val record = recordDisplay.record
-                record.status = com.example.plannotes.data.Record.STATUS_ABANDON
-                activity.dataManager.updateRecord(accountId, record)
-                loadData()
             }
             .setNegativeButton(R.string.cancel, null)
             .show()

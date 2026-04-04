@@ -8,6 +8,16 @@
         app:showAsAction="never" />
     
     <item
+        android:id="@+id/action_export"
+        android:title="@string/export_data"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/action_import"
+        android:title="@string/import_data"
+        app:showAsAction="never" />
+    
+    <item
         android:id="@+id/action_settings"
         android:title="@string/settings"
         app:showAsAction="never" />

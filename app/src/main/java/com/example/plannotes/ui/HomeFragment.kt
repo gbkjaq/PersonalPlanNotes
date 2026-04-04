@@ -48,6 +48,12 @@ class HomeFragment : Fragment() {
             },
             onItemLongClick = { account ->
                 showAccountOptions(account)
+            },
+            onProfitClick = { account ->
+                activity.showWholeAccountProfitDialog(account)
+            },
+            onAbandonClick = { account ->
+                activity.showWholeAccountAbandonDialog(account)
             }
         )
         
