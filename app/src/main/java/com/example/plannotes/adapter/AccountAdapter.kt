@@ -10,6 +10,7 @@ import com.example.plannotes.data.Account
 
 class AccountAdapter(
     private var accounts: List<Account>,
+    private val recordCounts: Map<String, Int>,
     private val onItemClick: (Account) -> Unit,
     private val onItemLongClick: (Account) -> Unit
 ) : RecyclerView.Adapter<AccountAdapter.ViewHolder>() {
@@ -28,6 +29,8 @@ class AccountAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val account = accounts[position]
         holder.tvName.text = account.name
+        val count = recordCounts[account.id] ?: 0
+        holder.tvRecordCount.text = "$count 条记录"
         holder.itemView.setOnClickListener { onItemClick(account) }
         holder.itemView.setOnLongClickListener {
             onItemLongClick(account)
@@ -37,7 +40,7 @@ class AccountAdapter(
     
     override fun getItemCount() = accounts.size
     
-    fun updateAccounts(newAccounts: List<Account>) {
+    fun updateAccounts(newAccounts: List<Account>, newRecordCounts: Map<String, Int>) {
         accounts = newAccounts
         notifyDataSetChanged()
     }

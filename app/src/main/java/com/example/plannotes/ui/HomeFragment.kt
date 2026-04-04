@@ -18,7 +18,8 @@ class HomeFragment : Fragment() {
     
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AccountAdapter
-    private val accounts get() = (activity as MainActivity).dataManager.getAccounts()
+    private val dataManager get() = (activity as MainActivity).dataManager
+    private val accounts get() = dataManager.getAccounts()
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +37,7 @@ class HomeFragment : Fragment() {
         
         adapter = AccountAdapter(
             accounts = accounts,
+            recordCounts = getRecordCounts(),
             onItemClick = { account ->
                 (activity as MainActivity).showAccountDetailFragment(account.id)
             },
@@ -54,7 +56,11 @@ class HomeFragment : Fragment() {
     
     override fun onResume() {
         super.onResume()
-        adapter.updateAccounts(accounts)
+        adapter.updateAccounts(accounts, getRecordCounts())
+    }
+    
+    private fun getRecordCounts(): Map<String, Int> {
+        return accounts.associate { it.id to dataManager.getRecords(it.id).size }
     }
     
     private fun showAccountOptions(account: Account) {
@@ -77,15 +83,15 @@ class HomeFragment : Fragment() {
     private fun renameAccount(account: Account) {
         (activity as MainActivity).showRenameDialog(account.id, account.name) { newName ->
             account.name = newName
-            (activity as MainActivity).dataManager.updateAccount(account)
-            adapter.updateAccounts(accounts)
+            dataManager.updateAccount(account)
+            adapter.updateAccounts(accounts, getRecordCounts())
         }
     }
     
     private fun deleteAccount(account: Account) {
         (activity as MainActivity).showDeleteConfirmDialog {
-            (activity as MainActivity).dataManager.deleteAccount(account.id)
-            adapter.updateAccounts(accounts)
+            dataManager.deleteAccount(account.id)
+            adapter.updateAccounts(accounts, getRecordCounts())
             Toast.makeText(requireContext(), R.string.deleted, Toast.LENGTH_SHORT).show()
         }
     }
@@ -94,8 +100,8 @@ class HomeFragment : Fragment() {
         (activity as MainActivity).showRenameDialog("", "") { name ->
             if (name.isNotEmpty()) {
                 val account = Account(name = name)
-                (activity as MainActivity).dataManager.addAccount(account)
-                adapter.updateAccounts(accounts)
+                dataManager.addAccount(account)
+                adapter.updateAccounts(accounts, getRecordCounts())
             }
         }
     }

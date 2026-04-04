@@ -43,7 +43,13 @@ class RecordAdapter(
         holder.tvPrincipal.text = formatCurrency(recordDisplay.principal)
         holder.tvProfit.text = formatCurrency(recordDisplay.profit)
         holder.tvTotalProfit.text = formatCurrency(recordDisplay.totalProfit)
-        holder.tvRemark.text = record.remark
+        
+        if (record.remark.isNotEmpty()) {
+            holder.tvRemark.visibility = View.VISIBLE
+            holder.tvRemark.text = record.remark
+        } else {
+            holder.tvRemark.visibility = View.GONE
+        }
         
         holder.itemView.setOnClickListener { onItemClick(recordDisplay) }
         holder.itemView.setOnLongClickListener {
