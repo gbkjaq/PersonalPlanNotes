@@ -88,8 +88,6 @@ class AccountDetailFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         loadData()
-        (activity as? MainActivity)?.title = (activity as MainActivity).dataManager.getAccounts()
-            .find { it.id == accountId }?.name
     }
     
     private fun loadData() {

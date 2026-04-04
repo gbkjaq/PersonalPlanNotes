@@ -5,8 +5,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import com.example.plannotes.data.DataManager
 import com.example.plannotes.ui.AccountDetailFragment
 import com.example.plannotes.ui.HomeFragment
@@ -16,10 +16,14 @@ import android.widget.EditText
 class MainActivity : AppCompatActivity() {
     
     lateinit var dataManager: DataManager
+    lateinit var toolbar: Toolbar
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
         
         dataManager = DataManager(this)
         
@@ -61,9 +65,9 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.commit {
-            replace(R.id.fragment_container, fragment)
-        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
     
     override fun onSupportNavigateUp(): Boolean {
