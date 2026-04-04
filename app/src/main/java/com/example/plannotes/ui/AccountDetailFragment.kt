@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.MainActivity
 import com.example.plannotes.R
-import com.example.plannotes.data.Record
 import com.example.plannotes.data.RecordDisplay
 import com.example.plannotes.adapter.RecordAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -207,8 +206,12 @@ class AccountDetailFragment : Fragment() {
                 if (amountStr.isNotEmpty()) {
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
                     val stage = etStage.text.toString().toIntOrNull() ?: 1
-                    val remark = etRemark.text.toString()
-                    val record = Record(amount = amount, stage = stage, remark = remark)
+                    val remarkText = etRemark.text.toString()
+                    val record = com.example.plannotes.data.Record(
+                        amount = amount,
+                        stage = stage,
+                        remark = remarkText
+                    )
                     activity.dataManager.addRecord(accountId, record)
                     loadData()
                 }
@@ -255,12 +258,12 @@ class AccountDetailFragment : Fragment() {
                 if (amountStr.isNotEmpty()) {
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
                     val stage = etStage.text.toString().toIntOrNull() ?: 1
-                    val remark = etRemark.text.toString()
-                    val record = Record(
+                    val remarkText = etRemark.text.toString()
+                    val record = com.example.plannotes.data.Record(
                         id = recordDisplay.record.id,
                         amount = amount,
                         stage = stage,
-                        remark = remark,
+                        remark = remarkText,
                         createTime = recordDisplay.record.createTime,
                         status = recordDisplay.record.status
                     )
