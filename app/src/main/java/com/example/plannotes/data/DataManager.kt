@@ -147,21 +147,6 @@ class DataManager(context: Context) {
             )
         }
     }
-            val profit = record.amount * coefficient
-            val totalProfit = profit - principal
-            runningPrincipal = principal
-            
-            RecordDisplay(
-                index = index + 1,
-                record = record,
-                principal = principal,
-                profit = profit,
-                totalProfit = totalProfit,
-                isProfit = record.status == Record.STATUS_PROFIT,
-                isAbandon = record.status == Record.STATUS_ABANDON
-            )
-        }
-    }
     
     fun getAccountWithRecords(accountId: String): AccountWithRecords {
         val accounts = getAccounts()
