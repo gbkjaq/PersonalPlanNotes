@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.plannotes.data.DataManager
 import com.example.plannotes.ui.HomeFragment
+import com.example.plannotes.ui.AccountDetailFragment
 import com.example.plannotes.ui.SettingsFragment
 import android.widget.EditText
 
@@ -44,6 +45,13 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    
+    fun showAccountDetailFragment(accountId: String) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, AccountDetailFragment.newInstance(accountId))
+            .addToBackStack(null)
+            .commit()
     }
     
     fun showRenameDialog(currentName: String, callback: (String) -> Unit) {
