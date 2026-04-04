@@ -5,10 +5,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.example.plannotes.data.DataManager
-import com.example.plannotes.ui.AccountDetailFragment
 import com.example.plannotes.ui.HomeFragment
 import com.example.plannotes.ui.SettingsFragment
 import android.widget.EditText
@@ -16,19 +14,17 @@ import android.widget.EditText
 class MainActivity : AppCompatActivity() {
     
     lateinit var dataManager: DataManager
-    lateinit var toolbar: Toolbar
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         
-        toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        
         dataManager = DataManager(this)
         
         if (savedInstanceState == null) {
-            showHomeFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, HomeFragment())
+                .commit()
         }
     }
     
@@ -40,50 +36,25 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                showSettingsFragment()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, SettingsFragment())
+                    .addToBackStack(null)
+                    .commit()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
     
-    fun showHomeFragment() {
-        replaceFragment(HomeFragment())
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        title = getString(R.string.app_name)
-    }
-    
-    fun showAccountDetailFragment(accountId: String) {
-        replaceFragment(AccountDetailFragment.newInstance(accountId))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-    
-    fun showSettingsFragment() {
-        replaceFragment(SettingsFragment())
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        title = getString(R.string.settings)
-    }
-    
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
-    }
-    
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return true
-    }
-    
-    fun showRenameDialog(accountId: String, currentName: String, callback: (String) -> Unit) {
+    fun showRenameDialog(currentName: String, callback: (String) -> Unit) {
         val editText = EditText(this).apply {
             setText(currentName)
         }
         
-        val title = if (currentName.isEmpty()) R.string.add_account else R.string.rename
+        val titleRes = if (currentName.isEmpty()) R.string.add_account else R.string.rename
         
         AlertDialog.Builder(this)
-            .setTitle(title)
+            .setTitle(titleRes)
             .setView(editText)
             .setPositiveButton(R.string.save) { _, _ ->
                 val newName = editText.text.toString().trim()

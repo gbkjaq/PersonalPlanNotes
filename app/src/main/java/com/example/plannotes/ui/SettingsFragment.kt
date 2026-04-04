@@ -15,9 +15,9 @@ import com.example.plannotes.data.Config
 
 class SettingsFragment : Fragment() {
     
-    private lateinit var etQuantity: EditText
-    private lateinit var etCoefficient: EditText
-    private lateinit var tvCurrentConfig: TextView
+    private var etQuantity: EditText? = null
+    private var etCoefficient: EditText? = null
+    private var tvCurrentConfig: TextView? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,33 +33,32 @@ class SettingsFragment : Fragment() {
         etQuantity = view.findViewById(R.id.et_quantity)
         etCoefficient = view.findViewById(R.id.et_coefficient)
         tvCurrentConfig = view.findViewById(R.id.tv_current_config)
-        val btnSave: Button = view.findViewById(R.id.btn_save)
+        val btnSave: Button? = view.findViewById(R.id.btn_save)
         
         loadConfig()
         
-        btnSave.setOnClickListener {
+        btnSave?.setOnClickListener {
             saveConfig()
         }
     }
     
     private fun loadConfig() {
-        val config = (activity as MainActivity).dataManager.getConfig()
-        etQuantity.setText(config.quantity.toString())
-        etCoefficient.setText(config.coefficient.toString())
+        val activity = activity as? MainActivity ?: return
+        val config = activity.dataManager.getConfig()
+        etQuantity?.setText(config.quantity.toString())
+        etCoefficient?.setText(config.coefficient.toString())
         updateCurrentConfigText(config)
     }
     
     private fun updateCurrentConfigText(config: Config) {
-        tvCurrentConfig.text = getString(
-            R.string.current_config,
-            config.quantity,
-            config.coefficient
-        )
+        tvCurrentConfig?.text = getString(R.string.current_config, config.quantity, config.coefficient)
     }
     
     private fun saveConfig() {
-        val quantityStr = etQuantity.text.toString()
-        val coefficientStr = etCoefficient.text.toString()
+        val activity = activity as? MainActivity ?: return
+        
+        val quantityStr = etQuantity?.text.toString() ?: ""
+        val coefficientStr = etCoefficient?.text.toString() ?: ""
         
         if (quantityStr.isEmpty() || coefficientStr.isEmpty()) {
             Toast.makeText(requireContext(), R.string.fill_all_fields, Toast.LENGTH_SHORT).show()
@@ -75,7 +74,7 @@ class SettingsFragment : Fragment() {
         }
         
         val config = Config(quantity = quantity, coefficient = coefficient)
-        (activity as MainActivity).dataManager.saveConfig(config)
+        activity.dataManager.saveConfig(config)
         updateCurrentConfigText(config)
         
         Toast.makeText(requireContext(), R.string.saved, Toast.LENGTH_SHORT).show()

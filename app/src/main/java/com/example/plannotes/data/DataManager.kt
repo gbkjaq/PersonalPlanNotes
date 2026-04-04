@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.google.gson.JsonSyntaxException
 
 class DataManager(context: Context) {
     
@@ -17,10 +18,14 @@ class DataManager(context: Context) {
     }
     
     fun getConfig(): Config {
-        val json = prefs.getString(KEY_CONFIG, null)
-        return if (json != null) {
-            gson.fromJson(json, Config::class.java)
-        } else {
+        return try {
+            val json = prefs.getString(KEY_CONFIG, null)
+            if (json != null) {
+                gson.fromJson(json, Config::class.java) ?: Config()
+            } else {
+                Config()
+            }
+        } catch (e: Exception) {
             Config()
         }
     }
@@ -30,13 +35,16 @@ class DataManager(context: Context) {
     }
     
     fun getAccounts(): List<Account> {
-        val json = prefs.getString(KEY_ACCOUNTS, null)
-        return if (json != null) {
-            val type = object : TypeToken<List<Account>>() {}.type
-            gson.fromJson(json, type)
-        } else {
-            val defaultAccount = Account()
-            listOf(defaultAccount)
+        return try {
+            val json = prefs.getString(KEY_ACCOUNTS, null)
+            if (json != null) {
+                val type = object : TypeToken<List<Account>>() {}.type
+                gson.fromJson(json, type) ?: listOf(Account())
+            } else {
+                listOf(Account())
+            }
+        } catch (e: Exception) {
+            listOf(Account())
         }
     }
     
@@ -71,11 +79,15 @@ class DataManager(context: Context) {
     }
     
     fun getRecords(accountId: String): List<Record> {
-        val json = prefs.getString(KEY_RECORDS_PREFIX + accountId, null)
-        return if (json != null) {
-            val type = object : TypeToken<List<Record>>() {}.type
-            gson.fromJson(json, type)
-        } else {
+        return try {
+            val json = prefs.getString(KEY_RECORDS_PREFIX + accountId, null)
+            if (json != null) {
+                val type = object : TypeToken<List<Record>>() {}.type
+                gson.fromJson(json, type) ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
             emptyList()
         }
     }
@@ -131,7 +143,8 @@ class DataManager(context: Context) {
     }
     
     fun getAccountWithRecords(accountId: String): AccountWithRecords {
-        val account = getAccounts().find { it.id == accountId } ?: Account()
+        val accounts = getAccounts()
+        val account = accounts.find { it.id == accountId } ?: accounts.firstOrNull() ?: Account()
         val config = getConfig()
         val records = getRecordsWithDisplay(accountId, config)
         return AccountWithRecords(account, records)

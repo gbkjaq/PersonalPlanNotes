@@ -16,10 +16,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class HomeFragment : Fragment() {
     
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: AccountAdapter
-    
-    private val dataManager get() = (activity as MainActivity).dataManager
+    private var recyclerView: RecyclerView? = null
+    private var adapter: AccountAdapter? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,11 +31,15 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         recyclerView = view.findViewById(R.id.recycler_accounts)
-        val fabAdd: FloatingActionButton = view.findViewById(R.id.fab_add_account)
+        val fabAdd: FloatingActionButton? = view.findViewById(R.id.fab_add_account)
+        
+        val activity = activity as? MainActivity ?: return
+        val accounts = activity.dataManager.getAccounts()
+        val recordCounts = accounts.associate { it.id to activity.dataManager.getRecords(it.id).size }
         
         adapter = AccountAdapter(
-            accounts = dataManager.getAccounts(),
-            recordCounts = getRecordCounts(),
+            accounts = accounts,
+            recordCounts = recordCounts,
             onItemClick = { account ->
                 (activity as MainActivity).showAccountDetailFragment(account.id)
             },
@@ -46,21 +48,24 @@ class HomeFragment : Fragment() {
             }
         )
         
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
+        recyclerView?.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView?.adapter = adapter
         
-        fabAdd.setOnClickListener {
+        fabAdd?.setOnClickListener {
             addNewAccount()
         }
     }
     
     override fun onResume() {
         super.onResume()
-        adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
+        refreshData()
     }
     
-    private fun getRecordCounts(): Map<String, Int> {
-        return dataManager.getAccounts().associate { it.id to dataManager.getRecords(it.id).size }
+    private fun refreshData() {
+        val activity = activity as? MainActivity ?: return
+        val accounts = activity.dataManager.getAccounts()
+        val recordCounts = accounts.associate { it.id to activity.dataManager.getRecords(it.id).size }
+        adapter?.updateAccounts(accounts, recordCounts)
     }
     
     private fun showAccountOptions(account: Account) {
@@ -69,39 +74,44 @@ class HomeFragment : Fragment() {
             getString(R.string.delete)
         )
         
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle(account.name)
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> renameAccount(account)
-                    1 -> deleteAccount(account)
+        activity?.let {
+            androidx.appcompat.app.AlertDialog.Builder(it)
+                .setTitle(account.name)
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> renameAccount(account)
+                        1 -> deleteAccount(account)
+                    }
                 }
-            }
-            .show()
+                .show()
+        }
     }
     
     private fun renameAccount(account: Account) {
-        (activity as MainActivity).showRenameDialog(account.id, account.name) { newName ->
+        val activity = activity as? MainActivity ?: return
+        activity.showRenameDialog(account.name) { newName ->
             account.name = newName
-            dataManager.updateAccount(account)
-            adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
+            activity.dataManager.updateAccount(account)
+            refreshData()
         }
     }
     
     private fun deleteAccount(account: Account) {
-        (activity as MainActivity).showDeleteConfirmDialog {
-            dataManager.deleteAccount(account.id)
-            adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
+        val activity = activity as? MainActivity ?: return
+        activity.showDeleteConfirmDialog {
+            activity.dataManager.deleteAccount(account.id)
+            refreshData()
             Toast.makeText(requireContext(), R.string.deleted, Toast.LENGTH_SHORT).show()
         }
     }
     
     private fun addNewAccount() {
-        (activity as MainActivity).showRenameDialog("", "") { name ->
+        val activity = activity as? MainActivity ?: return
+        activity.showRenameDialog("") { name ->
             if (name.isNotEmpty()) {
                 val account = Account(name = name)
-                dataManager.addAccount(account)
-                adapter.updateAccounts(dataManager.getAccounts(), getRecordCounts())
+                activity.dataManager.addAccount(account)
+                refreshData()
             }
         }
     }
