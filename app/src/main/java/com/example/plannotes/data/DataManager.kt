@@ -125,7 +125,7 @@ class DataManager(context: Context) {
         
         var records = getRecords(accountId).sortedBy { it.createTime }
         if (maxStage != null && maxStage > 0) {
-            records = records.filter { it.stage == maxStage }
+            records = records.filter { it.stage <= maxStage }
         }
         
         var runningPrincipal = 0.0

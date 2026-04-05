@@ -86,8 +86,17 @@ class AccountDetailFragment : Fragment() {
         setupDraggableFab(view)
         
         btnChangeStage?.setOnClickListener {
-            val activity = activity as? MainActivity ?: return@setOnClickListener
-            val account = activity.dataManager.getAccounts().find { it.id == accountId } ?: return@setOnClickListener
+            val activity = activity as? MainActivity
+            if (activity == null) {
+                Toast.makeText(requireContext(), "Activity无效", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val accounts = activity.dataManager.getAccounts()
+            val account = accounts.find { it.id == accountId }
+            if (account == null) {
+                Toast.makeText(requireContext(), "账户不存在", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             activity.showChangeStageDialog(account.currentStage) { newStage ->
                 account.currentStage = newStage
                 activity.dataManager.updateAccount(account)
@@ -156,9 +165,13 @@ class AccountDetailFragment : Fragment() {
         val activity = activity as? MainActivity ?: return
         val account = activity.dataManager.getAccounts().find { it.id == accountId } ?: return
         val config = activity.dataManager.getConfig()
-        val records = activity.dataManager.getRecordsWithDisplay(accountId, config, account.currentStage)
         
-        adapter?.updateRecords(records)
+        // 下方表格显示所有记录
+        val allRecords = activity.dataManager.getRecordsWithDisplay(accountId, config, null)
+        adapter?.updateRecords(allRecords)
+        
+        // 上方统计按当前阶段筛选
+        val filteredRecords = activity.dataManager.getRecordsWithDisplay(accountId, config, account.currentStage)
         
         tvStage?.text = getString(R.string.current_stage_format, account.currentStage)
         
@@ -166,8 +179,8 @@ class AccountDetailFragment : Fragment() {
         var totalProfit = 0.0
         var totalRevenue = 0.0
         
-        if (records.isNotEmpty()) {
-            val lastRecord = records.last()
+        if (filteredRecords.isNotEmpty()) {
+            val lastRecord = filteredRecords.last()
             totalPrincipal = lastRecord.principal
             totalProfit = lastRecord.profit
             totalRevenue = lastRecord.totalProfit
