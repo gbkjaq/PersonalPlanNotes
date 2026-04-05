@@ -15,6 +15,7 @@ class DataManager(context: Context) {
         private const val KEY_CONFIG = "config"
         private const val KEY_ACCOUNTS = "accounts"
         private const val KEY_RECORDS_PREFIX = "records_"
+        private const val KEY_PROFIT_LOSS = "profit_loss_records"
     }
     
     fun getConfig(): Config {
@@ -117,12 +118,15 @@ class DataManager(context: Context) {
         saveRecords(accountId, records)
     }
     
-    fun getRecordsWithDisplay(accountId: String, config: Config): List<RecordDisplay> {
+    fun getRecordsWithDisplay(accountId: String, config: Config, maxStage: Int? = null): List<RecordDisplay> {
         val account = getAccounts().find { it.id == accountId }
         val quantity = account?.quantity ?: 1
         val coefficient = config.coefficient
         
-        val records = getRecords(accountId)
+        var records = getRecords(accountId)
+        if (maxStage != null) {
+            records = records.filter { it.stage <= maxStage }
+        }
         val sortedRecords = records.sortedBy { it.createTime }
         
         var runningPrincipal = 0.0
@@ -162,7 +166,7 @@ class DataManager(context: Context) {
         val summaries = mutableMapOf<String, AccountSummary>()
         
         for (account in accounts) {
-            val records = getRecordsWithDisplay(account.id, config)
+            val records = getRecordsWithDisplay(account.id, config, account.currentStage)
             val lastRecord = records.lastOrNull()
             summaries[account.id] = AccountSummary(
                 principal = lastRecord?.principal ?: 0.0,
@@ -172,5 +176,45 @@ class DataManager(context: Context) {
         }
         
         return summaries
+    }
+    
+    fun getProfitLossRecords(): List<ProfitLossRecord> {
+        return try {
+            val json = prefs.getString(KEY_PROFIT_LOSS, null)
+            if (json != null) {
+                val type = object : TypeToken<List<ProfitLossRecord>>() {}.type
+                gson.fromJson(json, type) ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+    
+    fun saveProfitLossRecord(record: ProfitLossRecord) {
+        val records = getProfitLossRecords().toMutableList()
+        records.add(record)
+        prefs.edit().putString(KEY_PROFIT_LOSS, gson.toJson(records)).apply()
+    }
+    
+    fun addProfitRecord(accountName: String, stage: Int, principal: Double) {
+        val record = ProfitLossRecord(
+            accountName = accountName,
+            stage = stage,
+            principal = principal,
+            type = ProfitLossRecord.TYPE_PROFIT
+        )
+        saveProfitLossRecord(record)
+    }
+    
+    fun addAbandonRecord(accountName: String, stage: Int, principal: Double) {
+        val record = ProfitLossRecord(
+            accountName = accountName,
+            stage = stage,
+            principal = principal,
+            type = ProfitLossRecord.TYPE_ABANDON
+        )
+        saveProfitLossRecord(record)
     }
 }

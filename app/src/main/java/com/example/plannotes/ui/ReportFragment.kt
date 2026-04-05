@@ -11,8 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.MainActivity
 import com.example.plannotes.R
 import com.example.plannotes.adapter.ReportAdapter
-import com.example.plannotes.data.Record
-import com.example.plannotes.data.ReportItem
+import com.example.plannotes.data.ProfitLossRecord
 import com.google.android.material.tabs.TabLayout
 import java.util.Locale
 
@@ -25,8 +24,8 @@ class ReportFragment : Fragment() {
     private var tvTotalAbandon: TextView? = null
     private var adapter: ReportAdapter? = null
     
-    private var profitRecords = listOf<ReportItem>()
-    private var abandonRecords = listOf<ReportItem>()
+    private var profitRecords = listOf<ProfitLossRecord>()
+    private var abandonRecords = listOf<ProfitLossRecord>()
     
     companion object {
         fun newInstance(): ReportFragment {
@@ -71,32 +70,17 @@ class ReportFragment : Fragment() {
     
     private fun loadData() {
         val activity = activity as? MainActivity ?: return
-        val accounts = activity.dataManager.getAccounts()
         
-        profitRecords = mutableListOf()
-        abandonRecords = mutableListOf()
+        val allRecords = activity.dataManager.getProfitLossRecords()
         
-        var totalProfitAmount = 0.0
-        var totalAbandonAmount = 0.0
+        profitRecords = allRecords.filter { it.type == ProfitLossRecord.TYPE_PROFIT }
+        abandonRecords = allRecords.filter { it.type == ProfitLossRecord.TYPE_ABANDON }
         
-        for (account in accounts) {
-            val records = activity.dataManager.getRecords(account.id)
-            for (record in records) {
-                when (record.status) {
-                    Record.STATUS_PROFIT -> {
-                        totalProfitAmount += record.amount
-                        (profitRecords as MutableList).add(ReportItem(account.name, record))
-                    }
-                    Record.STATUS_ABANDON -> {
-                        totalAbandonAmount += record.amount
-                        (abandonRecords as MutableList).add(ReportItem(account.name, record))
-                    }
-                }
-            }
-        }
+        val totalProfit = profitRecords.sumOf { it.principal }
+        val totalAbandon = abandonRecords.sumOf { it.principal }
         
-        tvTotalProfit?.text = formatCurrency(totalProfitAmount)
-        tvTotalAbandon?.text = formatCurrency(totalAbandonAmount)
+        tvTotalProfit?.text = formatCurrency(totalProfit)
+        tvTotalAbandon?.text = formatCurrency(totalAbandon)
         
         updateList()
     }

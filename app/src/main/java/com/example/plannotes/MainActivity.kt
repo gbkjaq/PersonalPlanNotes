@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import com.example.plannotes.data.Account
 import com.example.plannotes.data.Config
 import com.example.plannotes.data.Record
+import com.example.plannotes.data.ProfitLossRecord
 import com.example.plannotes.ui.HomeFragment
 import com.example.plannotes.ui.AccountDetailFragment
 import com.example.plannotes.ui.SettingsFragment
@@ -103,6 +104,7 @@ class MainActivity : AppCompatActivity() {
             val config = dataManager.getConfig()
             val accounts = dataManager.getAccounts()
             val recordsMap = mutableMapOf<String, List<Record>>()
+            val profitLossRecords = dataManager.getProfitLossRecords()
             
             for (account in accounts) {
                 recordsMap[account.id] = dataManager.getRecords(account.id)
@@ -115,7 +117,8 @@ class MainActivity : AppCompatActivity() {
                 })
                 put("accounts", gson.toJson(accounts))
                 put("records", gson.toJson(recordsMap))
-                put("version", 1)
+                put("profitLossRecords", gson.toJson(profitLossRecords))
+                put("version", 2)
                 put("exportTime", System.currentTimeMillis())
             }
             
@@ -153,6 +156,15 @@ class MainActivity : AppCompatActivity() {
             
             for ((accountId, records) in recordsMap) {
                 dataManager.saveRecords(accountId, records)
+            }
+            
+            if (backup.has("profitLossRecords")) {
+                val profitLossJson = backup.getString("profitLossRecords")
+                val profitLossRecords = gson.fromJson(profitLossJson, Array<ProfitLossRecord>::class.java).toList()
+                val existingRecords = dataManager.getProfitLossRecords().toMutableList()
+                existingRecords.addAll(profitLossRecords)
+                val prefs = getSharedPreferences("plan_notes", MODE_PRIVATE)
+                prefs.edit().putString("profit_loss_records", gson.toJson(existingRecords)).apply()
             }
             
             Toast.makeText(this, R.string.import_success, Toast.LENGTH_SHORT).show()
@@ -241,13 +253,15 @@ class MainActivity : AppCompatActivity() {
     fun showWholeAccountProfitDialog(account: Account) {
         AlertDialog.Builder(this)
             .setTitle(R.string.profit_action)
-            .setMessage("将账本「${account.name}」所有记录标记为盈利？计划将重置为0阶段。")
+            .setMessage("将账本「${account.name}」第${account.currentStage}阶段标记为盈利？计划将重置为0阶段。")
             .setPositiveButton(R.string.confirm) { _, _ ->
-                val records = dataManager.getRecords(account.id)
-                for (record in records) {
-                    record.status = com.example.plannotes.data.Record.STATUS_PROFIT
-                    dataManager.updateRecord(account.id, record)
-                }
+                val config = dataManager.getConfig()
+                val records = dataManager.getRecordsWithDisplay(account.id, config, account.currentStage)
+                val lastRecord = records.lastOrNull()
+                val principal = lastRecord?.principal ?: 0.0
+                
+                dataManager.addProfitRecord(account.name, account.currentStage, principal)
+                
                 account.currentStage = 0
                 dataManager.updateAccount(account)
                 Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()
@@ -259,13 +273,15 @@ class MainActivity : AppCompatActivity() {
     fun showWholeAccountAbandonDialog(account: Account) {
         AlertDialog.Builder(this)
             .setTitle(R.string.abandon)
-            .setMessage("将账本「${account.name}」所有记录标记为放弃？计划将重置为0阶段。")
+            .setMessage("将账本「${account.name}」第${account.currentStage}阶段标记为放弃？计划将重置为0阶段。")
             .setPositiveButton(R.string.confirm) { _, _ ->
-                val records = dataManager.getRecords(account.id)
-                for (record in records) {
-                    record.status = com.example.plannotes.data.Record.STATUS_ABANDON
-                    dataManager.updateRecord(account.id, record)
-                }
+                val config = dataManager.getConfig()
+                val records = dataManager.getRecordsWithDisplay(account.id, config, account.currentStage)
+                val lastRecord = records.lastOrNull()
+                val principal = lastRecord?.principal ?: 0.0
+                
+                dataManager.addAbandonRecord(account.name, account.currentStage, principal)
+                
                 account.currentStage = 0
                 dataManager.updateAccount(account)
                 Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show()

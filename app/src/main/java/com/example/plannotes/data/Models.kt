@@ -54,5 +54,21 @@ data class AccountSummary(
 
 data class ReportItem(
     val accountName: String,
-    val record: Record
+    val stage: Int,
+    val amount: Double,
+    val createTime: Long
 )
+
+data class ProfitLossRecord(
+    val id: String = UUID.randomUUID().toString(),
+    val accountName: String = "",
+    val stage: Int = 0,
+    val principal: Double = 0.0,
+    val type: Int = TYPE_PROFIT,
+    val createTime: Long = System.currentTimeMillis()
+) {
+    companion object {
+        const val TYPE_PROFIT = 1
+        const val TYPE_ABANDON = 2
+    }
+}

@@ -6,14 +6,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.plannotes.R
-import com.example.plannotes.data.ReportItem
+import com.example.plannotes.data.ProfitLossRecord
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class ReportAdapter : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
     
-    private var items = listOf<ReportItem>()
+    private var items = listOf<ProfitLossRecord>()
     
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvAccount: TextView = view.findViewById(R.id.tv_account_name)
@@ -30,21 +30,15 @@ class ReportAdapter : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
     
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.tvAccount.text = item.accountName
-        holder.tvAmount.text = formatCurrency(item.record.amount)
-        holder.tvDate.text = formatDate(item.record.createTime)
-        
-        if (item.record.remark.isNotEmpty()) {
-            holder.tvRemark.visibility = View.VISIBLE
-            holder.tvRemark.text = item.record.remark
-        } else {
-            holder.tvRemark.visibility = View.GONE
-        }
+        holder.tvAccount.text = "${item.accountName} 第${item.stage}阶段"
+        holder.tvAmount.text = formatCurrency(item.principal)
+        holder.tvDate.text = formatDate(item.createTime)
+        holder.tvRemark.visibility = View.GONE
     }
     
     override fun getItemCount() = items.size
     
-    fun updateRecords(newItems: List<ReportItem>) {
+    fun updateRecords(newItems: List<ProfitLossRecord>) {
         items = newItems
         notifyDataSetChanged()
     }
