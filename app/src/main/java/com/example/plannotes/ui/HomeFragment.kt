@@ -162,12 +162,12 @@ class HomeFragment : Fragment() {
     
     private fun addNewAccount() {
         val activity = activity as? MainActivity ?: return
-        val account = activity.dataManager.getAccounts().find { it.id == accountId } ?: return
-        activity.showChangeStageDialog(account.currentStage) { newStage ->
-            account.currentStage = newStage
-            activity.dataManager.updateAccount(account)
-            refreshData()
-        }
+        activity.showRenameDialog("", 1, null, "") { name, quantity, coefficient, remark ->
+            if (name.isNotEmpty()) {
+                val account = Account(name = name, quantity = quantity, coefficient = coefficient, remark = remark)
+                activity.dataManager.addAccount(account)
+                refreshData()
+            }
         }
     }
 }

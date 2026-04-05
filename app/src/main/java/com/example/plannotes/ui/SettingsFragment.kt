@@ -66,7 +66,7 @@ class SettingsFragment : Fragment() {
         }
         
         val quantity = quantityStr.toIntOrNull()
-        val coefficient = coefficientStr.toIntOrNull()
+        val coefficient = coefficientStr.toDoubleOrNull()
         
         if (quantity == null || coefficient == null || quantity <= 0 || coefficient <= 0) {
             Toast.makeText(requireContext(), R.string.invalid_input, Toast.LENGTH_SHORT).show()

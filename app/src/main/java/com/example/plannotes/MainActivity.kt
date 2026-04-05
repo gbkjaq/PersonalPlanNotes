@@ -27,16 +27,20 @@ class MainActivity : AppCompatActivity() {
     lateinit var dataManager: DataManager
     private val gson = Gson()
     
+    private var exportIncludeReport = true
+    
     private var exportLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
-        uri?.let { exportData(it, true) }
+        uri?.let { exportToUri(it, exportIncludeReport) }
     }
+    
+    private var importIncludeReport = true
     
     private var importLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
-        uri?.let { importData(it, true) }
+        uri?.let { importData(it, importIncludeReport) }
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,11 +98,52 @@ class MainActivity : AppCompatActivity() {
             .setTitle("选择导出方式")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> exportLauncher.launch("plan_notes_backup_full.json")
-                    1 -> exportData(getExternalFilesDir(null), false)
+                    0 -> {
+                        exportIncludeReport = true
+                        exportLauncher.launch("plan_notes_backup_full.json")
+                    }
+                    1 -> {
+                        exportIncludeReport = false
+                        exportLauncher.launch("plan_notes_backup.json")
+                    }
                 }
             }
             .show()
+    }
+    
+    private fun exportToUri(uri: android.net.Uri, includeReport: Boolean) {
+        try {
+            val config = dataManager.getConfig()
+            val accounts = dataManager.getAccounts()
+            val recordsMap = mutableMapOf<String, List<Record>>()
+            
+            for (account in accounts) {
+                recordsMap[account.id] = dataManager.getRecords(account.id)
+            }
+            
+            val backup = JSONObject().apply {
+                put("config", JSONObject().apply {
+                    put("quantity", config.quantity)
+                    put("coefficient", config.coefficient)
+                })
+                put("accounts", gson.toJson(accounts))
+                put("records", gson.toJson(recordsMap))
+                if (includeReport) {
+                    val profitLossRecords = dataManager.getProfitLossRecords()
+                    put("profitLossRecords", gson.toJson(profitLossRecords))
+                }
+                put("version", 2)
+                put("exportTime", System.currentTimeMillis())
+            }
+            
+            contentResolver.openOutputStream(uri)?.use { outputStream ->
+                outputStream.write(backup.toString().toByteArray())
+            }
+            
+            Toast.makeText(this, R.string.export_success, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, R.string.export_failed, Toast.LENGTH_SHORT).show()
+        }
     }
     
     private fun showImportOptionsDialog() {
@@ -107,8 +152,14 @@ class MainActivity : AppCompatActivity() {
             .setTitle("选择导入方式")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> importLauncher.launch(arrayOf("application/json"))
-                    1 -> importLauncher.launch(arrayOf("application/json"))
+                    0 -> {
+                        importIncludeReport = true
+                        importLauncher.launch(arrayOf("application/json"))
+                    }
+                    1 -> {
+                        importIncludeReport = false
+                        importLauncher.launch(arrayOf("application/json"))
+                    }
                 }
             }
             .show()
@@ -160,7 +211,7 @@ class MainActivity : AppCompatActivity() {
             val configObj = backup.getJSONObject("config")
             val config = Config(
                 quantity = configObj.getInt("quantity"),
-                coefficient = configObj.getInt("coefficient")
+                coefficient = configObj.getDouble("coefficient")
             )
             dataManager.saveConfig(config)
             
