@@ -154,9 +154,9 @@ class AccountDetailFragment : Fragment() {
     
     private fun loadData() {
         val activity = activity as? MainActivity ?: return
-        val accountWithRecords = activity.dataManager.getAccountWithRecords(accountId)
-        val records = accountWithRecords.records
-        val account = accountWithRecords.account
+        val account = activity.dataManager.getAccounts().find { it.id == accountId } ?: return
+        val config = activity.dataManager.getConfig()
+        val records = activity.dataManager.getRecordsWithDisplay(accountId, config, account.currentStage)
         
         adapter?.updateRecords(records)
         
