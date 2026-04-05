@@ -258,9 +258,9 @@ class MainActivity : AppCompatActivity() {
                 val config = dataManager.getConfig()
                 val records = dataManager.getRecordsWithDisplay(account.id, config, account.currentStage)
                 val lastRecord = records.lastOrNull()
-                val principal = lastRecord?.principal ?: 0.0
+                val totalProfit = lastRecord?.totalProfit ?: 0.0
                 
-                dataManager.addProfitRecord(account.name, account.currentStage, principal)
+                dataManager.addProfitRecord(account.name, account.currentStage, totalProfit)
                 
                 account.currentStage = 0
                 dataManager.updateAccount(account)
