@@ -213,6 +213,13 @@ class AccountDetailFragment : Fragment() {
                         remark = remarkText
                     )
                     activity.dataManager.addRecord(accountId, record)
+                    
+                    val account = activity.dataManager.getAccounts().find { it.id == accountId }
+                    account?.let {
+                        it.currentStage = nextStage
+                        activity.dataManager.updateAccount(it)
+                    }
+                    
                     loadData()
                 }
             }
