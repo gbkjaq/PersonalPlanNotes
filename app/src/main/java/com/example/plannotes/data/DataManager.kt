@@ -153,7 +153,10 @@ class DataManager(context: Context) {
     
     fun getAccountWithRecords(accountId: String): AccountWithRecords {
         val accounts = getAccounts()
-        val account = accounts.find { it.id == accountId } ?: accounts.firstOrNull() ?: Account()
+        val account = accounts.find { it.id == accountId } ?: Account()
+        if (account.id.isEmpty()) {
+            return AccountWithRecords(account, emptyList())
+        }
         val config = getConfig()
         val records = getRecordsWithDisplay(accountId, config)
         return AccountWithRecords(account, records)

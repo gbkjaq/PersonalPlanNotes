@@ -65,10 +65,6 @@ class HomeFragment : Fragment() {
         recyclerView?.adapter = adapter
         
         setupDraggableFab(view)
-        
-        fabAdd?.setOnClickListener {
-            addNewAccount()
-        }
     }
     
     @SuppressLint("ClickableViewAccessibility")
@@ -76,6 +72,7 @@ class HomeFragment : Fragment() {
         var dX = 0f
         var dY = 0f
         var totalMoved = 0f
+        var clickInitiated = false
         
         fabAdd?.setOnTouchListener { view, event ->
             when (event.actionMasked) {
@@ -83,6 +80,7 @@ class HomeFragment : Fragment() {
                     dX = view.x - event.rawX
                     dY = view.y - event.rawY
                     totalMoved = 0f
+                    clickInitiated = true
                     false
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -97,13 +95,24 @@ class HomeFragment : Fragment() {
                     
                     view.x = newX.coerceIn(0f, maxX)
                     view.y = newY.coerceIn(0f, maxY)
+                    
+                    if (totalMoved > 10f) {
+                        clickInitiated = false
+                    }
                     totalMoved > 10f
                 }
                 MotionEvent.ACTION_UP -> {
-                    totalMoved > 10f
+                    if (clickInitiated && totalMoved <= 10f) {
+                        fabAdd?.performClick()
+                    }
+                    clickInitiated
                 }
                 else -> false
             }
+        }
+        
+        fabAdd?.setOnClickListener {
+            addNewAccount()
         }
     }
     

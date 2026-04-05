@@ -95,10 +95,6 @@ class AccountDetailFragment : Fragment() {
             }
         }
         
-        fabAdd?.setOnClickListener {
-            showAddRecordDialog()
-        }
-        
         loadData()
     }
     
@@ -107,6 +103,7 @@ class AccountDetailFragment : Fragment() {
         var dX = 0f
         var dY = 0f
         var totalMoved = 0f
+        var clickInitiated = false
         
         fabAdd?.setOnTouchListener { view, event ->
             when (event.actionMasked) {
@@ -114,6 +111,7 @@ class AccountDetailFragment : Fragment() {
                     dX = view.x - event.rawX
                     dY = view.y - event.rawY
                     totalMoved = 0f
+                    clickInitiated = true
                     false
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -128,13 +126,24 @@ class AccountDetailFragment : Fragment() {
                     
                     view.x = newX.coerceIn(0f, maxX)
                     view.y = newY.coerceIn(0f, maxY)
+                    
+                    if (totalMoved > 10f) {
+                        clickInitiated = false
+                    }
                     totalMoved > 10f
                 }
                 MotionEvent.ACTION_UP -> {
-                    totalMoved > 10f
+                    if (clickInitiated && totalMoved <= 10f) {
+                        fabAdd?.performClick()
+                    }
+                    clickInitiated
                 }
                 else -> false
             }
+        }
+        
+        fabAdd?.setOnClickListener {
+            showAddRecordDialog()
         }
     }
     
@@ -171,6 +180,10 @@ class AccountDetailFragment : Fragment() {
     
     private fun showAddRecordDialog() {
         val activity = activity as? MainActivity ?: return
+        if (accountId.isEmpty()) {
+            Toast.makeText(requireContext(), "账户无效", Toast.LENGTH_SHORT).show()
+            return
+        }
         val context = requireContext()
         
         val currentCount = activity.dataManager.getRecords(accountId).size
