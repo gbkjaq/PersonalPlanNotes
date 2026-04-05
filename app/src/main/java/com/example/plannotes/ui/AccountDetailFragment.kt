@@ -87,10 +87,10 @@ class AccountDetailFragment : Fragment() {
         
         btnChangeStage?.setOnClickListener {
             val activity = activity as? MainActivity ?: return@setOnClickListener
-            val account = activity.dataManager.getAccounts().find { it.id == accountId }
-            activity.showChangeStageDialog(account?.currentStage ?: 1) { newStage ->
-                account?.currentStage = newStage
-                activity.dataManager.updateAccount(account!!)
+            val account = activity.dataManager.getAccounts().find { it.id == accountId } ?: return@setOnClickListener
+            activity.showChangeStageDialog(account.currentStage) { newStage ->
+                account.currentStage = newStage
+                activity.dataManager.updateAccount(account)
                 loadData()
             }
         }
@@ -122,7 +122,7 @@ class AccountDetailFragment : Fragment() {
                     
                     totalMoved += kotlin.math.abs(event.rawX - (view.x - dX)) + kotlin.math.abs(event.rawY - (view.y - dY))
                     
-                    val parent = view.parent as View
+                    val parent = view.parent as? View ?: return@setOnTouchListener false
                     val maxX = parent.width - view.width.toFloat()
                     val maxY = parent.height - view.height.toFloat()
                     

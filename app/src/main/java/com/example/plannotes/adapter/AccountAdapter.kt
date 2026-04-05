@@ -14,6 +14,7 @@ import java.util.Locale
 class AccountAdapter(
     private var accounts: List<Account>,
     private var summaries: Map<String, AccountSummary>,
+    private var defaultCoefficient: Double = 47.0,
     private val onItemClick: (Account) -> Unit,
     private val onItemLongClick: (Account) -> Unit,
     private val onProfitClick: (Account) -> Unit,
@@ -26,6 +27,8 @@ class AccountAdapter(
         val tvPrincipal: TextView = view.findViewById(R.id.tv_principal)
         val tvProfit: TextView = view.findViewById(R.id.tv_profit)
         val tvRecordCount: TextView = view.findViewById(R.id.tv_record_count)
+        val tvCoefficient: TextView = view.findViewById(R.id.tv_coefficient)
+        val tvRemark: TextView = view.findViewById(R.id.tv_remark)
         val btnProfit: Button = view.findViewById(R.id.btn_profit)
         val btnAbandon: Button = view.findViewById(R.id.btn_abandon)
     }
@@ -51,6 +54,16 @@ class AccountAdapter(
         val count = summary?.recordCount ?: 0
         holder.tvRecordCount.text = "数量: ${account.quantity} | $count 条记录"
         
+        val coeff = account.coefficient ?: defaultCoefficient
+        holder.tvCoefficient.text = "系数: $coeff"
+        
+        if (account.remark.isNotEmpty()) {
+            holder.tvRemark.text = account.remark
+            holder.tvRemark.visibility = View.VISIBLE
+        } else {
+            holder.tvRemark.visibility = View.GONE
+        }
+        
         if (account.currentStage == 0) {
             holder.btnProfit.isEnabled = false
             holder.btnAbandon.isEnabled = false
@@ -74,9 +87,10 @@ class AccountAdapter(
     
     override fun getItemCount() = accounts.size
     
-    fun updateAccounts(newAccounts: List<Account>, newSummaries: Map<String, AccountSummary>) {
+    fun updateAccounts(newAccounts: List<Account>, newSummaries: Map<String, AccountSummary>, newDefaultCoefficient: Double? = null) {
         accounts = newAccounts
         summaries = newSummaries
+        newDefaultCoefficient?.let { defaultCoefficient = it }
         notifyDataSetChanged()
     }
     

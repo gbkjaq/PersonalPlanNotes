@@ -4,7 +4,7 @@ import java.util.UUID
 
 data class Config(
     var quantity: Int = 1,
-    var coefficient: Int = 47
+    var coefficient: Double = 47.0
 )
 
 data class Account(
@@ -12,6 +12,8 @@ data class Account(
     var name: String = "默认账本",
     var quantity: Int = 1,
     var currentStage: Int = 0,
+    var coefficient: Double? = null,
+    var remark: String = "",
     val createTime: Long = System.currentTimeMillis(),
     var updateTime: Long = System.currentTimeMillis()
 )

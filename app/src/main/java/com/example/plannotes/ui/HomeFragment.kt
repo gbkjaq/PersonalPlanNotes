@@ -39,10 +39,12 @@ class HomeFragment : Fragment() {
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
         val summaries = activity.dataManager.getAccountSummaries()
+        val defaultCoefficient = activity.dataManager.getConfig().coefficient
         
         adapter = AccountAdapter(
             accounts = accounts,
             summaries = summaries,
+            defaultCoefficient = defaultCoefficient,
             onItemClick = { account ->
                 (activity as MainActivity).showAccountDetailFragment(account.id)
             },
@@ -89,7 +91,7 @@ class HomeFragment : Fragment() {
                     
                     totalMoved += kotlin.math.abs(event.rawX - (view.x - dX)) + kotlin.math.abs(event.rawY - (view.y - dY))
                     
-                    val parent = view.parent as View
+                    val parent = view.parent as? View ?: return@setOnTouchListener false
                     val maxX = parent.width - view.width.toFloat()
                     val maxY = parent.height - view.height.toFloat()
                     
@@ -114,7 +116,8 @@ class HomeFragment : Fragment() {
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
         val summaries = activity.dataManager.getAccountSummaries()
-        adapter?.updateAccounts(accounts, summaries)
+        val defaultCoefficient = activity.dataManager.getConfig().coefficient
+        adapter?.updateAccounts(accounts, summaries, defaultCoefficient)
     }
     
     private fun showAccountOptions(account: Account) {
@@ -138,9 +141,11 @@ class HomeFragment : Fragment() {
     
     private fun renameAccount(account: Account) {
         val activity = activity as? MainActivity ?: return
-        activity.showRenameDialog(account.name, account.quantity) { newName, newQuantity ->
+        activity.showRenameDialog(account.name, account.quantity, account.coefficient, account.remark) { newName, newQuantity, newCoefficient, newRemark ->
             account.name = newName
             account.quantity = newQuantity
+            account.coefficient = newCoefficient
+            account.remark = newRemark
             activity.dataManager.updateAccount(account)
             refreshData()
         }
@@ -157,12 +162,12 @@ class HomeFragment : Fragment() {
     
     private fun addNewAccount() {
         val activity = activity as? MainActivity ?: return
-        activity.showRenameDialog("", 1) { name, quantity ->
-            if (name.isNotEmpty()) {
-                val account = Account(name = name, quantity = quantity)
-                activity.dataManager.addAccount(account)
-                refreshData()
-            }
+        val account = activity.dataManager.getAccounts().find { it.id == accountId } ?: return
+        activity.showChangeStageDialog(account.currentStage) { newStage ->
+            account.currentStage = newStage
+            activity.dataManager.updateAccount(account)
+            refreshData()
+        }
         }
     }
 }

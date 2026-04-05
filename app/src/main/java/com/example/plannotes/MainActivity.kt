@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity() {
     private var exportLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
-        uri?.let { exportData(it) }
+        uri?.let { exportData(it, true) }
     }
     
     private var importLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
-        uri?.let { importData(it) }
+        uri?.let { importData(it, true) }
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,11 +70,11 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_export -> {
-                exportLauncher.launch("plan_notes_backup.json")
+                showExportOptionsDialog()
                 true
             }
             R.id.action_import -> {
-                showImportConfirmDialog()
+                showImportOptionsDialog()
                 true
             }
             R.id.action_settings -> {
@@ -88,23 +88,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    private fun showImportConfirmDialog() {
+    private fun showExportOptionsDialog() {
+        val options = arrayOf("导出全部（含报表）", "仅导出计划列表")
         AlertDialog.Builder(this)
-            .setTitle(R.string.import_data)
-            .setMessage(R.string.import_confirm)
-            .setPositiveButton(R.string.confirm) { _, _ ->
-                importLauncher.launch(arrayOf("application/json"))
+            .setTitle("选择导出方式")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> exportLauncher.launch("plan_notes_backup_full.json")
+                    1 -> exportData(getExternalFilesDir(null), false)
+                }
             }
-            .setNegativeButton(R.string.cancel, null)
             .show()
     }
     
-    private fun exportData(uri: android.net.Uri) {
+    private fun showImportOptionsDialog() {
+        val options = arrayOf("导入全部（含报表）", "仅导入计划列表")
+        AlertDialog.Builder(this)
+            .setTitle("选择导入方式")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> importLauncher.launch(arrayOf("application/json"))
+                    1 -> importLauncher.launch(arrayOf("application/json"))
+                }
+            }
+            .show()
+    }
+    
+    private fun exportData(dir: java.io.File?, includeReport: Boolean) {
         try {
             val config = dataManager.getConfig()
             val accounts = dataManager.getAccounts()
             val recordsMap = mutableMapOf<String, List<Record>>()
-            val profitLossRecords = dataManager.getProfitLossRecords()
             
             for (account in accounts) {
                 recordsMap[account.id] = dataManager.getRecords(account.id)
@@ -117,14 +131,17 @@ class MainActivity : AppCompatActivity() {
                 })
                 put("accounts", gson.toJson(accounts))
                 put("records", gson.toJson(recordsMap))
-                put("profitLossRecords", gson.toJson(profitLossRecords))
+                if (includeReport) {
+                    val profitLossRecords = dataManager.getProfitLossRecords()
+                    put("profitLossRecords", gson.toJson(profitLossRecords))
+                }
                 put("version", 2)
                 put("exportTime", System.currentTimeMillis())
             }
             
-            contentResolver.openOutputStream(uri)?.use { output ->
-                output.write(backup.toString().toByteArray())
-            }
+            val fileName = if (includeReport) "plan_notes_backup_full.json" else "plan_notes_backup.json"
+            val file = java.io.File(dir, fileName)
+            file.writeText(backup.toString())
             
             Toast.makeText(this, R.string.export_success, Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
@@ -132,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    private fun importData(uri: android.net.Uri) {
+    private fun importData(uri: android.net.Uri, includeReport: Boolean) {
         try {
             val json = contentResolver.openInputStream(uri)?.use { input ->
                 input.bufferedReader().readText()
@@ -158,7 +175,7 @@ class MainActivity : AppCompatActivity() {
                 dataManager.saveRecords(accountId, records)
             }
             
-            if (backup.has("profitLossRecords")) {
+            if (includeReport && backup.has("profitLossRecords")) {
                 val profitLossJson = backup.getString("profitLossRecords")
                 val profitLossRecords = gson.fromJson(profitLossJson, Array<ProfitLossRecord>::class.java).toList()
                 val existingRecords = dataManager.getProfitLossRecords().toMutableList()
@@ -185,7 +202,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
     
-    fun showRenameDialog(currentName: String, currentQuantity: Int = 1, callback: (String, Int) -> Unit) {
+    fun showRenameDialog(currentName: String, currentQuantity: Int = 1, currentCoefficient: Double? = null, currentRemark: String = "", callback: (String, Int, Double?, String) -> Unit) {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(50, 20, 50, 20)
@@ -202,8 +219,21 @@ class MainActivity : AppCompatActivity() {
             setText(currentQuantity.toString())
         }
         
+        val etCoefficient = EditText(this).apply {
+            hint = "系数（留空使用系统配置）"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            currentCoefficient?.let { setText(it.toString()) }
+        }
+        
+        val etRemark = EditText(this).apply {
+            hint = "备注"
+            setText(currentRemark)
+        }
+        
         layout.addView(editText)
         layout.addView(etQuantity)
+        layout.addView(etCoefficient)
+        layout.addView(etRemark)
         
         val titleRes = if (currentName.isEmpty()) R.string.add_account else R.string.rename
         
@@ -213,8 +243,15 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(R.string.save) { _, _ ->
                 val newName = editText.text.toString().trim()
                 val quantity = etQuantity.text.toString().toIntOrNull() ?: 1
+                val coefficientStr = etCoefficient.text.toString()
+                val coefficient = if (coefficientStr.isNotEmpty()) {
+                    coefficientStr.toDoubleOrNull()
+                } else {
+                    null
+                }
+                val remark = etRemark.text.toString().trim()
                 if (newName.isNotEmpty()) {
-                    callback(newName, quantity)
+                    callback(newName, quantity, coefficient, remark)
                 }
             }
             .setNegativeButton(R.string.cancel, null)

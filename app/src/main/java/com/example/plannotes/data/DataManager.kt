@@ -121,7 +121,7 @@ class DataManager(context: Context) {
     fun getRecordsWithDisplay(accountId: String, config: Config, maxStage: Int? = null): List<RecordDisplay> {
         val account = getAccounts().find { it.id == accountId }
         val quantity = account?.quantity ?: 1
-        val coefficient = config.coefficient
+        val coefficient = account?.coefficient ?: config.coefficient
         
         var records = getRecords(accountId)
         if (maxStage != null) {
