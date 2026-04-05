@@ -123,14 +123,13 @@ class DataManager(context: Context) {
         val quantity = account?.quantity ?: 1
         val coefficient = account?.coefficient ?: config.coefficient
         
-        var records = getRecords(accountId)
-        if (maxStage != null) {
+        var records = getRecords(accountId).sortedBy { it.createTime }
+        if (maxStage != null && maxStage > 0) {
             records = records.filter { it.stage <= maxStage }
         }
-        val sortedRecords = records.sortedBy { it.createTime }
         
         var runningPrincipal = 0.0
-        return sortedRecords.mapIndexed { index, record ->
+        return records.mapIndexed { index, record ->
             val principal = if (index == 0) {
                 record.amount * quantity
             } else {

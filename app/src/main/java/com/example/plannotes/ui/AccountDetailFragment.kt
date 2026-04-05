@@ -173,9 +173,17 @@ class AccountDetailFragment : Fragment() {
         val activity = activity as? MainActivity ?: return
         val context = requireContext()
         
+        val currentCount = activity.dataManager.getRecords(accountId).size
+        val nextStage = currentCount + 1
+        
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(50, 20, 50, 20)
+        }
+        
+        val tvStage = android.widget.TextView(context).apply {
+            text = "第 $nextStage 阶段"
+            textSize = 16f
         }
         
         val etAmount = EditText(context).apply {
@@ -187,6 +195,7 @@ class AccountDetailFragment : Fragment() {
             hint = getString(R.string.remark)
         }
         
+        layout.addView(tvStage)
         layout.addView(etAmount)
         layout.addView(etRemark)
         
@@ -200,6 +209,7 @@ class AccountDetailFragment : Fragment() {
                     val remarkText = etRemark.text.toString()
                     val record = com.example.plannotes.data.Record(
                         amount = amount,
+                        stage = nextStage,
                         remark = remarkText
                     )
                     activity.dataManager.addRecord(accountId, record)
