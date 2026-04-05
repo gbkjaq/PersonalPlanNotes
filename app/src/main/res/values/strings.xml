@@ -38,7 +38,7 @@
     <string name="total_principal">总本金</string>
     <string name="total_profit">总收益</string>
     <string name="total_revenue">净利润</string>
-    <string name="current_config">当前配置：数量=%1$d，系数=%2$d</string>
+    <string name="current_config">当前配置：数量=%1$d，系数=%2$.2f</string>
     <string name="profit_action">盈利</string>
     <string name="abandon">放弃</string>
     <string name="report">计划报表</string>

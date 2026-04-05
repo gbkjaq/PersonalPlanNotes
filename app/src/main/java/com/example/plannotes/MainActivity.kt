@@ -165,41 +165,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
     
-    private fun exportData(dir: java.io.File?, includeReport: Boolean) {
-        try {
-            val config = dataManager.getConfig()
-            val accounts = dataManager.getAccounts()
-            val recordsMap = mutableMapOf<String, List<Record>>()
-            
-            for (account in accounts) {
-                recordsMap[account.id] = dataManager.getRecords(account.id)
-            }
-            
-            val backup = JSONObject().apply {
-                put("config", JSONObject().apply {
-                    put("quantity", config.quantity)
-                    put("coefficient", config.coefficient)
-                })
-                put("accounts", gson.toJson(accounts))
-                put("records", gson.toJson(recordsMap))
-                if (includeReport) {
-                    val profitLossRecords = dataManager.getProfitLossRecords()
-                    put("profitLossRecords", gson.toJson(profitLossRecords))
-                }
-                put("version", 2)
-                put("exportTime", System.currentTimeMillis())
-            }
-            
-            val fileName = if (includeReport) "plan_notes_backup_full.json" else "plan_notes_backup.json"
-            val file = java.io.File(dir, fileName)
-            file.writeText(backup.toString())
-            
-            Toast.makeText(this, R.string.export_success, Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, R.string.export_failed, Toast.LENGTH_SHORT).show()
-        }
-    }
-    
     private fun importData(uri: android.net.Uri, includeReport: Boolean) {
         try {
             val json = contentResolver.openInputStream(uri)?.use { input ->

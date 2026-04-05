@@ -172,7 +172,6 @@ class AccountDetailFragment : Fragment() {
     private fun showAddRecordDialog() {
         val activity = activity as? MainActivity ?: return
         val context = requireContext()
-        val account = activity.dataManager.getAccounts().find { it.id == accountId }
         
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -184,18 +183,11 @@ class AccountDetailFragment : Fragment() {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
         }
         
-        val etStage = EditText(context).apply {
-            hint = getString(R.string.stage)
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            setText((account?.currentStage ?: 1).toString())
-        }
-        
         val etRemark = EditText(context).apply {
             hint = getString(R.string.remark)
         }
         
         layout.addView(etAmount)
-        layout.addView(etStage)
         layout.addView(etRemark)
         
         androidx.appcompat.app.AlertDialog.Builder(context)
@@ -205,11 +197,9 @@ class AccountDetailFragment : Fragment() {
                 val amountStr = etAmount.text.toString()
                 if (amountStr.isNotEmpty()) {
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
-                    val stage = etStage.text.toString().toIntOrNull() ?: 1
                     val remarkText = etRemark.text.toString()
                     val record = com.example.plannotes.data.Record(
                         amount = amount,
-                        stage = stage,
                         remark = remarkText
                     )
                     activity.dataManager.addRecord(accountId, record)
@@ -234,19 +224,12 @@ class AccountDetailFragment : Fragment() {
             setText(recordDisplay.record.amount.toString())
         }
         
-        val etStage = EditText(context).apply {
-            hint = getString(R.string.stage)
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            setText(recordDisplay.record.stage.toString())
-        }
-        
         val etRemark = EditText(context).apply {
             hint = getString(R.string.remark)
             setText(recordDisplay.record.remark)
         }
         
         layout.addView(etAmount)
-        layout.addView(etStage)
         layout.addView(etRemark)
         
         androidx.appcompat.app.AlertDialog.Builder(context)
@@ -257,12 +240,11 @@ class AccountDetailFragment : Fragment() {
                 val amountStr = etAmount.text.toString()
                 if (amountStr.isNotEmpty()) {
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
-                    val stage = etStage.text.toString().toIntOrNull() ?: 1
                     val remarkText = etRemark.text.toString()
                     val record = com.example.plannotes.data.Record(
                         id = recordDisplay.record.id,
                         amount = amount,
-                        stage = stage,
+                        stage = recordDisplay.record.stage,
                         remark = remarkText,
                         createTime = recordDisplay.record.createTime,
                         status = recordDisplay.record.status

@@ -19,7 +19,6 @@ class RecordAdapter(
     
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvIndex: TextView = view.findViewById(R.id.tv_index)
-        val tvStage: TextView = view.findViewById(R.id.tv_stage)
         val tvDate: TextView = view.findViewById(R.id.tv_date)
         val tvAmount: TextView = view.findViewById(R.id.tv_amount)
         val tvPrincipal: TextView = view.findViewById(R.id.tv_principal)
@@ -38,7 +37,6 @@ class RecordAdapter(
         val record = recordDisplay.record
         
         holder.tvIndex.text = recordDisplay.index.toString()
-        holder.tvStage.text = record.stage.toString()
         holder.tvDate.text = formatDate(record.createTime)
         holder.tvAmount.text = formatCurrency(record.amount)
         holder.tvPrincipal.text = formatCurrency(recordDisplay.principal)
