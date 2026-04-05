@@ -169,6 +169,7 @@ class DataManager(context: Context) {
             val lastRecord = records.lastOrNull()
             summaries[account.id] = AccountSummary(
                 principal = lastRecord?.principal ?: 0.0,
+                profit = lastRecord?.profit ?: 0.0,
                 totalProfit = lastRecord?.totalProfit ?: 0.0,
                 recordCount = records.size
             )

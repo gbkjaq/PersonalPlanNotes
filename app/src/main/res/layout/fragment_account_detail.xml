@@ -144,13 +144,6 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:text="@string/stage"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-
-            <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="@string/date"

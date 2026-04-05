@@ -47,9 +47,9 @@ class AccountAdapter(
         holder.tvStage.text = "阶段: ${account.currentStage}"
         
         val principal = summary?.principal ?: 0.0
-        val totalProfit = summary?.totalProfit ?: 0.0
+        val profit = summary?.profit ?: 0.0
         holder.tvPrincipal.text = "本金: ${formatCurrency(principal)}"
-        holder.tvProfit.text = "盈利: ${formatCurrency(totalProfit)}"
+        holder.tvProfit.text = "总收益: ${formatCurrency(profit)}"
         
         val count = summary?.recordCount ?: 0
         holder.tvRecordCount.text = "数量: ${account.quantity} | $count 条记录"

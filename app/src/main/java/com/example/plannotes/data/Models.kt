@@ -50,6 +50,7 @@ data class AccountWithRecords(
 
 data class AccountSummary(
     val principal: Double,
+    val profit: Double,
     val totalProfit: Double,
     val recordCount: Int
 )
