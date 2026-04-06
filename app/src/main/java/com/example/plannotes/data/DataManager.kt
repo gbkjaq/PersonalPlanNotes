@@ -169,12 +169,14 @@ class DataManager(context: Context) {
         
         for (account in accounts) {
             val records = getRecordsWithDisplay(account.id, config, account.currentStage)
+            val totalRecords = getRecords(account.id).size
             val lastRecord = records.lastOrNull()
             summaries[account.id] = AccountSummary(
                 principal = lastRecord?.principal ?: 0.0,
                 profit = lastRecord?.profit ?: 0.0,
                 totalProfit = lastRecord?.totalProfit ?: 0.0,
-                recordCount = records.size
+                recordCount = records.size,
+                totalRecordCount = totalRecords
             )
         }
         

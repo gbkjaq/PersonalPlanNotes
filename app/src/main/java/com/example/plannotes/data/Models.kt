@@ -52,7 +52,8 @@ data class AccountSummary(
     val principal: Double,
     val profit: Double,
     val totalProfit: Double,
-    val recordCount: Int
+    val recordCount: Int,
+    val totalRecordCount: Int
 )
 
 data class ReportItem(

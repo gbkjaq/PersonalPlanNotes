@@ -51,8 +51,8 @@ class AccountAdapter(
         holder.tvPrincipal.text = "本金: ${formatCurrency(principal)}"
         holder.tvProfit.text = "收益: ${formatCurrency(totalProfit)}"
         
-        val count = summary?.recordCount ?: 0
-        holder.tvRecordCount.text = "数量: ${account.quantity} | $count 条记录"
+        val totalCount = summary?.totalRecordCount ?: 0
+        holder.tvRecordCount.text = "数量: ${account.quantity} | $totalCount 条记录"
         
         val coeff = account.coefficient ?: defaultCoefficient
         holder.tvCoefficient.text = "系数: $coeff"
