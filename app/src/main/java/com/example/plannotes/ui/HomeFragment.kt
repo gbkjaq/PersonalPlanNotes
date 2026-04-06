@@ -15,12 +15,16 @@ import com.example.plannotes.R
 import com.example.plannotes.data.Account
 import com.example.plannotes.adapter.AccountAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.Locale
 
 class HomeFragment : Fragment() {
     
     private var recyclerView: RecyclerView? = null
     private var adapter: AccountAdapter? = null
     private var fabAdd: FloatingActionButton? = null
+    private var tvTotalPrincipal: android.widget.TextView? = null
+    private var tvTotalProfit: android.widget.TextView? = null
+    private var tvAccountCount: android.widget.TextView? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,6 +39,9 @@ class HomeFragment : Fragment() {
         
         recyclerView = view.findViewById(R.id.recycler_accounts)
         fabAdd = view.findViewById(R.id.fab_add_account)
+        tvTotalPrincipal = view.findViewById(R.id.tv_total_principal)
+        tvTotalProfit = view.findViewById(R.id.tv_total_profit)
+        tvAccountCount = view.findViewById(R.id.tv_account_count)
         
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
@@ -64,6 +71,7 @@ class HomeFragment : Fragment() {
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         recyclerView?.adapter = adapter
         
+        refreshData()
         setupDraggableFab(view)
     }
     
@@ -127,6 +135,22 @@ class HomeFragment : Fragment() {
         val summaries = activity.dataManager.getAccountSummaries()
         val defaultCoefficient = activity.dataManager.getConfig().coefficient
         adapter?.updateAccounts(accounts, summaries, defaultCoefficient)
+        
+        // 计算汇总统计
+        var totalPrincipal = 0.0
+        var totalProfit = 0.0
+        for (account in accounts) {
+            val summary = summaries[account.id]
+            totalPrincipal += summary?.principal ?: 0.0
+            totalProfit += summary?.totalProfit ?: 0.0
+        }
+        tvTotalPrincipal?.text = formatCurrency(totalPrincipal)
+        tvTotalProfit?.text = formatCurrency(totalProfit)
+        tvAccountCount?.text = accounts.size.toString()
+    }
+    
+    private fun formatCurrency(amount: Double): String {
+        return String.format(Locale.getDefault(), "%.2f", amount)
     }
     
     private fun showAccountOptions(account: Account) {
