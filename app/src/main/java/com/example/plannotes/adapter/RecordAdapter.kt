@@ -19,6 +19,7 @@ class RecordAdapter(
     
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvIndex: TextView = view.findViewById(R.id.tv_index)
+        val tvTotalCount: TextView = view.findViewById(R.id.tv_total_count)
         val tvDate: TextView = view.findViewById(R.id.tv_date)
         val tvAmount: TextView = view.findViewById(R.id.tv_amount)
         val tvPrincipal: TextView = view.findViewById(R.id.tv_principal)
@@ -37,6 +38,7 @@ class RecordAdapter(
         val record = recordDisplay.record
         
         holder.tvIndex.text = recordDisplay.index.toString()
+        holder.tvTotalCount.text = "/${records.size}"
         holder.tvDate.text = formatDate(record.createTime)
         holder.tvAmount.text = formatCurrency(record.amount)
         holder.tvPrincipal.text = formatCurrency(recordDisplay.principal)

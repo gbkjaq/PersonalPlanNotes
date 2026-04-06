@@ -25,6 +25,8 @@ class HomeFragment : Fragment() {
     private var tvTotalPrincipal: android.widget.TextView? = null
     private var tvTotalProfit: android.widget.TextView? = null
     private var tvAccountCount: android.widget.TextView? = null
+    private var tvReportProfit: android.widget.TextView? = null
+    private var tvReportAbandon: android.widget.TextView? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +44,8 @@ class HomeFragment : Fragment() {
         tvTotalPrincipal = view.findViewById(R.id.tv_total_principal)
         tvTotalProfit = view.findViewById(R.id.tv_total_profit)
         tvAccountCount = view.findViewById(R.id.tv_account_count)
+        tvReportProfit = view.findViewById(R.id.tv_report_profit)
+        tvReportAbandon = view.findViewById(R.id.tv_report_abandon)
         
         val activity = activity as? MainActivity ?: return
         val accounts = activity.dataManager.getAccounts()
@@ -147,6 +151,20 @@ class HomeFragment : Fragment() {
         tvTotalPrincipal?.text = formatCurrency(totalPrincipal)
         tvTotalProfit?.text = formatCurrency(totalProfit)
         tvAccountCount?.text = accounts.size.toString()
+        
+        // 计算报表统计
+        val profitLossRecords = activity.dataManager.getProfitLossRecords()
+        var reportProfit = 0.0
+        var reportAbandon = 0.0
+        for (record in profitLossRecords) {
+            if (record.type == com.example.plannotes.data.ProfitLossRecord.TYPE_PROFIT) {
+                reportProfit += record.principal
+            } else {
+                reportAbandon += record.principal
+            }
+        }
+        tvReportProfit?.text = formatCurrency(reportProfit)
+        tvReportAbandon?.text = formatCurrency(reportAbandon)
     }
     
     private fun formatCurrency(amount: Double): String {

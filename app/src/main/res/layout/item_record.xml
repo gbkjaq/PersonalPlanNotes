@@ -9,9 +9,16 @@
 
     <TextView
         android:id="@+id/tv_index"
-        android:layout_width="30dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:textSize="12sp" />
+    
+    <TextView
+        android:id="@+id/tv_total_count"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="@android:color/darker_gray" />
 
     <TextView
         android:id="@+id/tv_date"
